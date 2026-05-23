@@ -327,6 +327,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            max-width: 600px;
         }
         
         .server-blade {
@@ -990,6 +991,46 @@
             
             .pricing-features li {
                 margin-bottom: 10px;
+            }
+        }
+
+        /* Responsive Image Optimization */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        picture {
+            display: block;
+        }
+
+        /* Image Container Responsiveness */
+        .server-graphic {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .server-blade {
+            width: 90%;
+            height: 50px;
+        }
+
+        /* Ensure images scale with containers */
+        @supports (object-fit: cover) {
+            img {
+                width: 100%;
+                height: auto;
+                object-fit: cover;
+                object-position: center;
+            }
+        }
+
+        /* High DPI/Retina Support */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .pricing-card,
+            .feature-card {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
             }
         }
     </style>

@@ -318,6 +318,14 @@
             justify-content: center;
             overflow: hidden;
         }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
         
         .floating-element {
             position: absolute;
@@ -509,6 +517,14 @@
             color: white;
             position: relative;
             overflow: hidden;
+        }
+
+        .team-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
 
         .team-image::after {
@@ -842,6 +858,15 @@
             justify-content: center;
             color: white;
             font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
         
         .project-content {
@@ -881,6 +906,15 @@
             justify-content: center;
             color: white;
             font-size: 2rem;
+            overflow: hidden;
+        }
+
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
         
         .blog-content {
@@ -1244,6 +1278,19 @@
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
+
+            .project-image {
+                height: 250px;
+            }
+
+            .blog-image {
+                height: 250px;
+            }
+
+            .team-image {
+                height: 250px;
+                font-size: 3rem;
+            }
             
             .expertise-grid {
                 grid-template-columns: 1fr;
@@ -1356,7 +1403,17 @@
             
             .team-image {
                 height: 220px;
-                font-size: 3rem;
+                font-size: 2.5rem;
+            }
+
+            .project-image {
+                height: 220px;
+                font-size: 2rem;
+            }
+
+            .blog-image {
+                height: 220px;
+                font-size: 1.5rem;
             }
         }
         
@@ -1447,6 +1504,60 @@
         
         textarea {
             resize: vertical;
+        }
+
+        /* Responsive Image Optimization */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        picture {
+            display: block;
+        }
+
+        /* Image Container Responsiveness */
+        .project-card img,
+        .blog-card img,
+        .team-card img,
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Ensure images scale with containers */
+        @supports (object-fit: cover) {
+            .project-image img,
+            .blog-image img,
+            .team-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+        }
+
+        /* Fallback for older browsers */
+        @supports not (object-fit: cover) {
+            .project-image img,
+            .blog-image img,
+            .team-image img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* High DPI/Retina Support */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .service-card,
+            .project-card,
+            .blog-card,
+            .team-card {
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            }
         }
     </style>
 </head>
@@ -1801,7 +1912,7 @@
                 
                 <div class="project-card">
                     <div class="project-image">
-                        <img  style="width: 300px; height: 250px;" src="greenweb.png" alt="green filed school website">
+                        <img src="greenweb.png" alt="Green Field School Website">
                     </div>
                     <div class="project-content">
                         <h3>Healthcare Mobile App</h3>
