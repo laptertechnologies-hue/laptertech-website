@@ -354,6 +354,225 @@
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
         }
+
+        /* Enhanced Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+            }
+        }
+
+        .service-card {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .project-card {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .blog-card {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .blog-card:nth-child(1) { animation-delay: 0.1s; }
+        .blog-card:nth-child(2) { animation-delay: 0.2s; }
+        .blog-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .team-card {
+            animation: scaleUp 0.6s ease-out forwards;
+        }
+
+        .team-card:nth-child(1) { animation-delay: 0.1s; }
+        .team-card:nth-child(2) { animation-delay: 0.2s; }
+        .team-card:nth-child(3) { animation-delay: 0.3s; }
+        .team-card:nth-child(4) { animation-delay: 0.4s; }
+        .team-card:nth-child(5) { animation-delay: 0.5s; }
+        .team-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .process-step {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .process-step:nth-child(1) { animation-delay: 0.1s; }
+        .process-step:nth-child(2) { animation-delay: 0.2s; }
+        .process-step:nth-child(3) { animation-delay: 0.3s; }
+        .process-step:nth-child(4) { animation-delay: 0.4s; }
+        .process-step:nth-child(5) { animation-delay: 0.5s; }
+
+        .tech-item {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .tech-item:nth-child(1) { animation-delay: 0.05s; }
+        .tech-item:nth-child(2) { animation-delay: 0.1s; }
+        .tech-item:nth-child(3) { animation-delay: 0.15s; }
+        .tech-item:nth-child(4) { animation-delay: 0.2s; }
+        .tech-item:nth-child(5) { animation-delay: 0.25s; }
+        .tech-item:nth-child(6) { animation-delay: 0.3s; }
+        .tech-item:nth-child(7) { animation-delay: 0.35s; }
+        .tech-item:nth-child(8) { animation-delay: 0.4s; }
+        .tech-item:nth-child(9) { animation-delay: 0.45s; }
+        .tech-item:nth-child(10) { animation-delay: 0.5s; }
+
+        /* Team Section */
+        .team-section {
+            background-color: rgba(37, 99, 235, 0.03);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .team-card {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .team-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .team-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-image::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            transition: width 0.3s ease;
+        }
+
+        .team-card:hover .team-image::after {
+            width: 100%;
+        }
+
+        .team-info {
+            padding: 35px 25px;
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .team-position {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .team-bio {
+            color: var(--gray-color);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .team-socials {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .team-social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            border-radius: 50%;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .team-social-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
         
         .service-button {
     display: inline-flex;
@@ -990,6 +1209,15 @@
         }
         
         @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.6rem; }
+            h3 { font-size: 1.3rem; }
+            
+            .hero {
+                padding-top: 100px;
+                min-height: 70vh;
+            }
+            
             .hero-btns {
                 flex-direction: column;
                 width: 100%;
@@ -1000,13 +1228,135 @@
                 margin-bottom: 10px;
             }
             
-            .chat-box {
-                width: 300px;
-                height: 400px;
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .expertise-grid {
+                grid-template-columns: 1fr;
             }
             
             .tech-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            
+            .partners-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .process-timeline {
+                margin-top: 20px;
+            }
+            
+            .section-padding {
+                padding: 50px 0;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .slogan {
+                font-size: 1.2rem;
+            }
+            
+            .chat-box {
+                width: 280px;
+                height: 350px;
+            }
+            
+            .hero-image {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+            
+            .nav-links {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.1rem; }
+            
+            .hero {
+                padding-top: 80px;
+                min-height: 60vh;
+            }
+            
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .partners-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .section-padding {
+                padding: 30px 0;
+            }
+            
+            .container {
+                padding: 0 12px;
+            }
+            
+            .service-card {
+                padding: 20px;
+            }
+            
+            .project-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .team-card:hover {
+                transform: translateY(-10px);
+            }
+            
+            .chat-box {
+                width: 100vw;
+                height: 80vh;
+                bottom: 0 !important;
+                right: 0 !important;
+                border-radius: 20px 20px 0 0;
+                max-width: 100%;
+            }
+            
+            .team-image {
+                height: 220px;
+                font-size: 3rem;
             }
         }
         
@@ -1117,6 +1467,7 @@
                     <li><a href="#process">Our Process</a></li>
                     <li><a href="#technology">Tech Stack</a></li>
                     <li><a href="#projects">Projects</a></li>
+                    <li><a href="#team">Team</a></li>
                     <li><a href="#blog">Resources</a></li>
                     <li><a href="#faq">FAQ</a></li>
                 </ul>
@@ -1147,6 +1498,7 @@
             <li><a href="#process" class="mobile-nav-link">Our Process</a></li>
             <li><a href="#technology" class="mobile-nav-link">Tech Stack</a></li>
             <li><a href="#projects" class="mobile-nav-link">Projects</a></li>
+            <li><a href="#team" class="mobile-nav-link">Team</a></li>
             <li><a href="#blog" class="mobile-nav-link">Resources</a></li>
         </ul>
     </div>
@@ -1488,6 +1840,114 @@
                             <span class="tech-tag">Vue.js</span>
                             <span class="tech-tag">Python</span>
                             <span class="tech-tag">PostgreSQL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section-padding team-section" id="team">
+        <div class="container">
+            <div class="section-header">
+                <h2>Meet Our Team</h2>
+                <p>Talented professionals dedicated to delivering excellence and innovation</p>
+            </div>
+            
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">John Smith</h3>
+                        <p class="team-position">CEO & Founder</p>
+                        <p class="team-bio">Visionary leader with 15+ years of experience in software development and business strategy.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Sarah Johnson</h3>
+                        <p class="team-position">CTO & Tech Lead</p>
+                        <p class="team-bio">Expert architect specializing in scalable systems and cloud infrastructure with 12+ years expertise.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Michael Chen</h3>
+                        <p class="team-position">Lead UI/UX Designer</p>
+                        <p class="team-bio">Creative designer crafting beautiful and intuitive user experiences for enterprise applications.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="Dribbble"><i class="fab fa-dribbble"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Emily Rodriguez</h3>
+                        <p class="team-position">Senior Mobile Developer</p>
+                        <p class="team-bio">Passionate about building cross-platform mobile applications with exceptional performance and UX.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">David Williams</h3>
+                        <p class="team-position">Backend Developer</p>
+                        <p class="team-bio">Database specialist building robust APIs and microservices for enterprise-scale applications.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" class="team-social-link" title="Stack Overflow"><i class="fab fa-stack-overflow"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Lisa Anderson</h3>
+                        <p class="team-position">QA Manager</p>
+                        <p class="team-bio">Quality assurance expert ensuring all projects meet highest standards and deliver exceptional results.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="team-social-link" title="Email"><i class="fas fa-envelope"></i></a>
                         </div>
                     </div>
                 </div>

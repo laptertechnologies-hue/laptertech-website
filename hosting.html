@@ -646,6 +646,64 @@
         .menu-overlay.active {
             display: block;
         }
+
+        /* Enhanced Animations for Hosting Page */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .pricing-card {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .pricing-card:nth-child(1) { animation-delay: 0.1s; }
+        .pricing-card:nth-child(2) { animation-delay: 0.2s; }
+        .pricing-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .feature-card {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
         
         /* Account Modal */
         .account-modal {
@@ -801,12 +859,138 @@
         }
         
         @media (max-width: 768px) {
-            .hero-btns { flex-direction: column; }
-            .btn { width: 100%; margin-bottom: 10px; }
-            .pricing-cards { grid-template-columns: 1fr; }
-            .hosting-tabs { flex-direction: column; align-items: center; }
-            .domain-search { flex-direction: column; gap: 10px; background: transparent; padding: 0; }
-            .domain-search input, .domain-search button { width: 100%; }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.6rem; }
+            h3 { font-size: 1.3rem; }
+            
+            .hero {
+                padding-top: 100px;
+                min-height: 70vh;
+            }
+            
+            .hero-btns {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .hosting-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .domain-search {
+                flex-direction: column;
+                gap: 10px;
+                background: transparent;
+                padding: 0;
+            }
+            
+            .domain-search input,
+            .domain-search button {
+                width: 100%;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-table {
+                overflow-x: auto;
+            }
+            
+            .section-padding {
+                padding: 50px 0;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 25px;
+                margin-top: 30px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-height: 85vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.1rem; }
+            
+            .hero {
+                padding-top: 80px;
+                min-height: 60vh;
+            }
+            
+            .section-padding {
+                padding: 30px 0;
+            }
+            
+            .container {
+                padding: 0 12px;
+            }
+            
+            .pricing-card {
+                padding: 25px 15px;
+            }
+            
+            .pricing-price {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                gap: 20px;
+            }
+            
+            .feature-card {
+                padding: 25px 15px;
+            }
+            
+            .feature-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .pricing-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .modal-content {
+                width: 98%;
+            }
+            
+            .table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+            }
+            
+            .pricing-features li {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -828,6 +1012,7 @@
                     <li><a href="index.html#process">Our Process</a></li>
                     <li><a href="index.html#technology">Tech Stack</a></li>
                     <li><a href="index.html#projects">Projects</a></li>
+                    <li><a href="index.html#team">Team</a></li>
                     <li><a href="index.html#blog">Resources</a></li>
                 </ul>
             </nav>
@@ -848,6 +1033,7 @@
             <li><a href="index.html#process" class="mobile-nav-link">Our Process</a></li>
             <li><a href="index.html#technology" class="mobile-nav-link">Tech Stack</a></li>
             <li><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
+            <li><a href="index.html#team" class="mobile-nav-link">Team</a></li>
             <li><a href="index.html#blog" class="mobile-nav-link">Resources</a></li>
         </ul>
     </div>
