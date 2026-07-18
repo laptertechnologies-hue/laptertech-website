@@ -1578,7 +1578,7 @@
                     <li><a href="#technology">Tech Stack</a></li>
                     <li><a href="#projects">Projects</a></li>
                     <li><a href="#team">Team</a></li>
-                     <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
                 </ul>
             </nav>
             
@@ -1619,9 +1619,9 @@
                 <h1>Engineering the Future of Technology</h1>
                 <p class="slogan">We build cutting-edge software solutions that transform ideas into scalable, secure, and <br>  innovative products for the modern world.</p>
                 
-                <div class="hero-btns">
+                    <div class="hero-btns">
                     <a href="#services" class="btn">Explore Services</a>
-                    <a href="#contact" class="btn btn-outline">Start a Project</a>
+                    <a href="contact.html" class="btn btn-outline">Start a Project</a>
                 </div>
             </div>
             
@@ -2094,6 +2094,53 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Mercy .N</h3>
+                        <p class="team-position">Frontend Developer</p>
+                        <p class="team-bio">Skilled in modern JavaScript frameworks, building responsive interfaces with great attention to performance and accessibility.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Bangole Alvin</h3>
+                        <p class="team-position">DevOps Engineer</p>
+                        <p class="team-bio">Automates deployments and maintains scalable infrastructure with a focus on CI/CD, monitoring, and cloud cost efficiency.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Isabirye Alex</h3>
+                        <p class="team-position">Product Manager</p>
+                        <p class="team-bio">Bridges business and engineering to deliver product strategies that solve user problems and drive growth.</p>
+                        <div class="team-socials">
+                            <a href="#" class="team-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="team-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -2159,10 +2206,10 @@
 
     <!-- Final CTA Section -->
     <section class="cta-section" id="contact">
-        <div class="container">
+            <div class="container">
             <h2>Ready to Start Your Project?</h2>
             <p>Let's discuss your ideas and build something amazing together. Get in touch for a free consultation.</p>
-            <a href="#contact" class="btn">Start Your Project Now</a>
+            <a href="contact.html" class="btn">Start Your Project Now</a>
         </div>
     </section>
 
@@ -2401,12 +2448,15 @@
         });
         
         // Newsletter Form
-        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            alert(`Thank you for subscribing with ${email}! You'll receive our next newsletter.`);
-            this.reset();
-        });
+        const newsletterForm = document.getElementById('newsletterForm');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input[type="email"]').value;
+                alert(`Thank you for subscribing with ${email}! You'll receive our next newsletter.`);
+                this.reset();
+            });
+        }
         
         // Contact Form Submission
         document.getElementById('contactForm')?.addEventListener('submit', function(e) {
