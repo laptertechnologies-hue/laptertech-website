@@ -1209,6 +1209,27 @@
                     </button>
                 </div>
                 
+                <!-- Email Hosting Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <div class="pricing-name">Business Email</div>
+                        <div class="pricing-save">Premium Branded Email Hosting</div>
+                    </div>
+                    
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Custom Branded Email (name@domain)</li>
+                        <li><i class="fas fa-check"></i> 5 GB to 20 GB Storage options</li>
+                        <li><i class="fas fa-check"></i> Secure Webmail Interface</li>
+                        <li><i class="fas fa-check"></i> SSL Mail Encryption</li>
+                        <li><i class="fas fa-check"></i> Advanced Spam Protection</li>
+                        <li><i class="fas fa-check"></i> SMTP/IMAP Server Access</li>
+                    </ul>
+                    
+                    <button class="btn btn-outline select-plan" data-plan="email-only">
+                        Select Email Plan
+                    </button>
+                </div>
+                
                 
             </div>
         </div>
@@ -1458,10 +1479,31 @@
                     <div class="form-group">
                         <label for="hostingPlanSelect">Select Hosting Plan</label>
                         <select id="hostingPlanSelect">
-                            <option value="basic">Basic Hosting - $4.99/month</option>
-                            <option value="professional">Professional - $9.99/month</option>
-                            <option value="business">Business - $19.99/month</option>
+                            <option value="basic">Basic Hosting</option>
+                            <option value="professional">Professional Hosting</option>
+                            <option value="email-only">Business Email Only</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group" id="emailHostingFields" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <div style="margin-bottom: 15px;">
+                            <label for="mailboxCountSelect">Number of Email Mailboxes</label>
+                            <select id="mailboxCountSelect" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: inherit;">
+                                <option value="1">1 Mailbox</option>
+                                <option value="5" selected>5 Mailboxes</option>
+                                <option value="10">10 Mailboxes</option>
+                                <option value="20">20 Mailboxes</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="mailboxStorageSelect">Storage Limit per Mailbox</label>
+                            <select id="mailboxStorageSelect" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: inherit;">
+                                <option value="2">2 GB Storage</option>
+                                <option value="5" selected>5 GB Storage</option>
+                                <option value="10">10 GB Storage</option>
+                                <option value="20">20 GB Storage</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -1583,15 +1625,26 @@
             });
         }
         
-        // Plan Selection
+        // Plan Selection & Change Handler
         const selectPlanButtons = document.querySelectorAll('.select-plan');
+        const hostingPlanSelect = document.getElementById('hostingPlanSelect');
+        const emailHostingFields = document.getElementById('emailHostingFields');
+
+        hostingPlanSelect?.addEventListener('change', () => {
+            if (hostingPlanSelect.value === 'email-only') {
+                emailHostingFields.style.display = 'block';
+            } else {
+                emailHostingFields.style.display = 'none';
+            }
+        });
         
         selectPlanButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const plan = button.getAttribute('data-plan');
                 accountModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-                document.getElementById('hostingPlanSelect').value = plan;
+                hostingPlanSelect.value = plan;
+                hostingPlanSelect.dispatchEvent(new Event('change'));
             });
         });
         
@@ -1648,8 +1701,8 @@
                             </table>
                         </div>
 
-                        <!-- Step 3 -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                        <!-- Step 3 (Conditional) -->
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px; ${data.serviceType === 'email-only' ? 'display: none;' : ''}">
                             <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-database"></i> Step 3: MySQL Database</h4>
                             <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
                                 <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Database:</td><td style="font-weight: 600;">${data.dbName}</td></tr>
@@ -1660,11 +1713,15 @@
 
                         <!-- Step 4 -->
                         <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-envelope"></i> Step 4: Business Email & Webmail</h4>
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-envelope"></i> Step ${data.serviceType === 'email-only' ? '3' : '4'}: Business Email & Webmail</h4>
                             <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
                                 <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Webmail URL:</td><td><a href="${data.webmail}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.webmail}</a></td></tr>
                                 <tr><td style="padding: 3px 0; color: #94a3b8;">Email Address:</td><td style="font-weight: 600; color: #38bdf8;">${data.emailAccount}</td></tr>
                                 <tr><td style="padding: 3px 0; color: #94a3b8;">Email Pass:</td><td style="font-family: monospace; color: #f43f5e;">${data.emailPassword}</td></tr>
+                                ${data.serviceType === 'email-only' ? `
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Mailbox Limit:</td><td style="font-weight: 600;">Max ${data.mailboxLimit} Accounts</td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Total Storage:</td><td style="font-weight: 600;">${data.storageQuota}</td></tr>
+                                ` : ''}
                             </table>
                         </div>
                     </div>
@@ -1689,10 +1746,14 @@
             const hostingPlan = document.getElementById('hostingPlanSelect').value;
             const domainName = document.getElementById('domainName').value.trim() || '';
             
+            const isEmailOnly = hostingPlan === 'email-only';
+            const mCount = isEmailOnly ? document.getElementById('mailboxCountSelect').value : 1;
+            const mStorage = isEmailOnly ? document.getElementById('mailboxStorageSelect').value : 5;
+
             const planNames = {
                 'basic': 'Basic Hosting',
                 'professional': 'Professional Hosting',
-                'business': 'Business Hosting'
+                'email-only': 'Business Email Only'
             };
 
             const submitBtn = accountForm.querySelector('button[type="submit"]');
@@ -1710,7 +1771,10 @@
                     name: fullName,
                     email: email,
                     plan: planNames[hostingPlan],
-                    domain: domainName
+                    domain: domainName,
+                    serviceType: isEmailOnly ? 'email-only' : 'web-hosting',
+                    mailboxCount: parseInt(mCount, 10),
+                    mailboxStorage: parseInt(mStorage, 10)
                 })
             })
             .then(res => res.json())

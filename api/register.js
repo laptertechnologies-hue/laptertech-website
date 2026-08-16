@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { name, email, plan, domain } = req.body;
+    const { name, email, plan, domain, serviceType, mailboxCount, mailboxStorage } = req.body;
 
     if (!name || !email || !plan) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -81,7 +81,7 @@ module.exports = async (req, res) => {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    // 3. Create User account
+    // 3. Create HestiaCP User account
     const userRes = await callHestia('v-add-user', [username, password, email]);
     if (userRes.exitCode > 0) {
       return res.status(500).json({ 
@@ -92,60 +92,101 @@ module.exports = async (req, res) => {
 
     const clientDomain = domain ? domain.trim() : `${username}.laptertech.store`;
 
-    // 4. Create Web Domain & Mail Domain
-    await callHestia('v-add-web-domain', [username, clientDomain]);
-    await callHestia('v-add-mail-domain', [username, clientDomain]);
+    if (serviceType === 'email-only') {
+      // Setup Standalone Email Hosting
+      await callHestia('v-add-mail-domain', [username, clientDomain]);
+      await callHestia('v-add-mail-account', [username, clientDomain, 'info', password]);
 
-    // 5. Create default email mailbox (info@)
-    await callHestia('v-add-mail-account', [username, clientDomain, 'info', password]);
+      // Enforce custom limits for Standalone Email Hosting
+      const maxMailboxes = mailboxCount ? String(mailboxCount) : '5';
+      const quotaInMB = mailboxStorage ? String(parseInt(mailboxStorage, 10) * 1024) : '5120'; // Default 5GB
 
-    // 6. Create MySQL Database
-    const dbNameSuffix = 'db1';
-    const dbUserSuffix = 'user1';
-    const dbName = `${username}_${dbNameSuffix}`;
-    const dbUser = `${username}_${dbUserSuffix}`;
-    await callHestia('v-add-database', [username, dbNameSuffix, dbUserSuffix, password]);
+      await callHestia('v-change-user-config-value', [username, 'WEB_DOMAINS', '0']);
+      await callHestia('v-change-user-config-value', [username, 'DATABASES', '0']);
+      await callHestia('v-change-user-config-value', [username, 'MAIL_DOMAINS', '1']);
+      await callHestia('v-change-user-config-value', [username, 'MAIL_ACCOUNTS', maxMailboxes]);
+      await callHestia('v-change-user-config-value', [username, 'DISK_QUOTA', quotaInMB]);
 
-    // Send copy of credentials to the admin email using FormSubmit.co
-    try {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), 5000);
-      
-      await fetch("https://formsubmit.co/ajax/84561253b0208cfa5a295d9bee25ff9d", {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              _subject: `New Hosting Account Provisioned: ${plan}`,
-              username: username,
-              name: name,
-              email: email,
-              plan: plan,
-              domain: clientDomain,
-              password: password,
-              database: dbName,
-              dbUser: dbUser
-          }),
-          signal: id.signal
+      // Send copy of credentials to admin
+      try {
+        await fetch("https://formsubmit.co/ajax/84561253b0208cfa5a295d9bee25ff9d", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                _subject: `New Custom Email Hosting: ${plan}`,
+                username: username,
+                name: name,
+                email: email,
+                domain: clientDomain,
+                mailboxLimit: maxMailboxes,
+                storageQuota: `${mailboxStorage || 5} GB`,
+                password: password
+            })
+        });
+      } catch (e) {}
+
+      return res.status(200).json({
+        success: true,
+        serviceType: 'email-only',
+        username: username,
+        password: password,
+        domain: clientDomain,
+        emailServer: 'mail.laptertech.store',
+        emailAccount: `info@${clientDomain}`,
+        emailPassword: password,
+        mailboxLimit: maxMailboxes,
+        storageQuota: `${mailboxStorage || 5} GB`,
+        controlPanel: 'https://162.35.98.198:8083',
+        webmail: 'https://162.35.98.198:8083/webmail/'
       });
-      clearTimeout(id);
-    } catch (e) {
-      // Ignore notification failures
-    }
 
-    return res.status(200).json({
-      success: true,
-      username: username,
-      password: password,
-      domain: clientDomain,
-      emailServer: 'mail.laptertech.store',
-      emailAccount: `info@${clientDomain}`,
-      emailPassword: password,
-      dbName: dbName,
-      dbUser: dbUser,
-      dbPassword: password,
-      controlPanel: 'https://162.35.98.198:8083',
-      webmail: 'https://162.35.98.198:8083/webmail/'
-    });
+    } else {
+      // Setup Full Web Hosting (Default)
+      await callHestia('v-add-web-domain', [username, clientDomain]);
+      await callHestia('v-add-mail-domain', [username, clientDomain]);
+      await callHestia('v-add-mail-account', [username, clientDomain, 'info', password]);
+
+      const dbNameSuffix = 'db1';
+      const dbUserSuffix = 'user1';
+      const dbName = `${username}_${dbNameSuffix}`;
+      const dbUser = `${username}_${dbUserSuffix}`;
+      await callHestia('v-add-database', [username, dbNameSuffix, dbUserSuffix, password]);
+
+      // Send copy of credentials to admin
+      try {
+        await fetch("https://formsubmit.co/ajax/84561253b0208cfa5a295d9bee25ff9d", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                _subject: `New Web Hosting Provisioned: ${plan}`,
+                username: username,
+                name: name,
+                email: email,
+                plan: plan,
+                domain: clientDomain,
+                password: password,
+                database: dbName,
+                dbUser: dbUser
+            })
+        });
+      } catch (e) {}
+
+      return res.status(200).json({
+        success: true,
+        serviceType: 'web-hosting',
+        username: username,
+        password: password,
+        domain: clientDomain,
+        emailServer: 'mail.laptertech.store',
+        emailAccount: `info@${clientDomain}`,
+        emailPassword: password,
+        dbName: dbName,
+        dbUser: dbUser,
+        dbPassword: password,
+        controlPanel: 'https://162.35.98.198:8083',
+        webmail: 'https://162.35.98.198:8083/webmail/'
+      });
+    }
 
   } catch (error) {
     console.error(error);
