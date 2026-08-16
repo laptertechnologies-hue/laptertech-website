@@ -1066,6 +1066,15 @@
                 </ul>
             </nav>
             
+            <div class="nav-buttons">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
         </div>
     </header>
 
@@ -1523,19 +1532,19 @@
     <script>
         // Theme Toggle
         const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = themeToggle.querySelector('i');
+        const themeIcon = themeToggle?.querySelector('i');
         
-        themeToggle.addEventListener('click', () => {
+        themeToggle?.addEventListener('click', () => {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             
             if (currentTheme === 'light') {
                 html.setAttribute('data-theme', 'dark');
-                themeIcon.className = 'fas fa-sun';
+                if (themeIcon) themeIcon.className = 'fas fa-sun';
                 localStorage.setItem('theme', 'dark');
             } else {
                 html.setAttribute('data-theme', 'light');
-                themeIcon.className = 'fas fa-moon';
+                if (themeIcon) themeIcon.className = 'fas fa-moon';
                 localStorage.setItem('theme', 'light');
             }
         });
@@ -1543,7 +1552,7 @@
         // Set initial theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        if (themeIcon) themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         
         // Mobile Menu Functionality
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -1552,22 +1561,22 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
         
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.add('active');
-            menuOverlay.classList.add('active');
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu?.classList.add('active');
+            menuOverlay?.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
         
-        mobileMenuClose.addEventListener('click', closeMobileMenu);
-        menuOverlay.addEventListener('click', closeMobileMenu);
+        mobileMenuClose?.addEventListener('click', closeMobileMenu);
+        menuOverlay?.addEventListener('click', closeMobileMenu);
         
         mobileNavLinks.forEach(link => {
             link.addEventListener('click', closeMobileMenu);
         });
         
         function closeMobileMenu() {
-            mobileMenu.classList.remove('active');
-            menuOverlay.classList.remove('active');
+            mobileMenu?.classList.remove('active');
+            menuOverlay?.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
         
@@ -1580,17 +1589,17 @@
         
         [openAccountModal, openAccountModalHero, openAccountModalCTA].forEach(btn => {
             btn?.addEventListener('click', () => {
-                accountModal.style.display = 'flex';
+                if (accountModal) accountModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             });
         });
         
-        closeAccountModal.addEventListener('click', () => {
-            accountModal.style.display = 'none';
+        closeAccountModal?.addEventListener('click', () => {
+            if (accountModal) accountModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         });
         
-        accountModal.addEventListener('click', (e) => {
+        accountModal?.addEventListener('click', (e) => {
             if (e.target === accountModal) {
                 accountModal.style.display = 'none';
                 document.body.style.overflow = 'auto';
