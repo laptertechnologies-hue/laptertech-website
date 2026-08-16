@@ -228,6 +228,42 @@
             width: 100%;
         }
         
+        .nav-link-login {
+            border: 1.5px solid var(--hosting-green);
+            color: var(--hosting-green) !important;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .nav-link-login:hover {
+            background: rgba(16, 185, 129, 0.08);
+        }
+        
+        .nav-link-login::after {
+            display: none !important;
+        }
+        
+        .nav-link-signup {
+            background: linear-gradient(135deg, var(--hosting-green), #059669);
+            color: white !important;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+        
+        .nav-link-signup:hover {
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.35);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link-signup::after {
+            display: none !important;
+        }
+
         .nav-buttons {
             display: flex;
             align-items: center;
@@ -1053,7 +1089,7 @@
             </a>
             
             <nav class="desktop-nav">
-                <ul class="nav-links">
+                <ul class="nav-links" style="align-items: center;">
                     <li><a href="index.html#home">Home</a></li>
                     <li><a href="index.html#services">Services</a></li>
                     <li><a href="hosting.html" style="color: var(--hosting-green); font-weight: 600;">Hosting</a></li>
@@ -1063,6 +1099,8 @@
                     <li><a href="index.html#projects">Projects</a></li>
                     <li><a href="index.html#team">Team</a></li>
                     <li><a href="index.html#blog">Resources</a></li>
+                    <li><a href="#login" class="nav-link-login">Login</a></li>
+                    <li><a href="#signup" class="nav-link-signup">Sign Up</a></li>
                 </ul>
             </nav>
             
@@ -1093,6 +1131,8 @@
             <li><a href="index.html#projects" class="mobile-nav-link">Projects</a></li>
             <li><a href="index.html#team" class="mobile-nav-link">Team</a></li>
             <li><a href="index.html#blog" class="mobile-nav-link">Resources</a></li>
+            <li style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px;"><a href="#login" class="mobile-nav-link nav-link-login" style="display: block; text-align: center; margin-bottom: 10px;">Login</a></li>
+            <li><a href="#signup" class="mobile-nav-link nav-link-signup" style="display: block; text-align: center;">Sign Up</a></li>
         </ul>
     </div>
 
@@ -1580,6 +1620,77 @@
             document.body.style.overflow = 'auto';
         }
         
+        // Login Portal Generator
+        function showLoginPortal() {
+            const existing = document.getElementById('loginPortalModal');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'loginPortalModal';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+                font-family: 'Inter', sans-serif;
+            `;
+
+            overlay.innerHTML = `
+                <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; width: 100%; max-width: 420px; padding: 30px; color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); text-align: center; position: relative;">
+                    <button onclick="document.getElementById('loginPortalModal').remove()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer; transition: color 0.2s;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 15px auto;">
+                        <i class="fas fa-right-to-bracket"></i>
+                    </div>
+                    <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;">Lapter Access Portal</h3>
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px;">Select which dashboard you would like to log into:</p>
+                    
+                    <div style="display: grid; gap: 15px;">
+                        <a href="https://162.35.98.198:8083" target="_blank" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; color: inherit; text-decoration: none; text-align: left; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.borderColor='rgba(16, 185, 129, 0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                            <div style="width: 36px; height: 36px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.9rem; font-weight: 600; margin: 0;">Control Panel</h4>
+                                <p style="font-size: 0.7rem; color: #94a3b8; margin: 0;">Manage hosting spaces, databases & FTP.</p>
+                            </div>
+                        </a>
+
+                        <a href="https://162.35.98.198:8083/webmail/" target="_blank" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; color: inherit; text-decoration: none; text-align: left; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.borderColor='rgba(16, 185, 129, 0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                            <div style="width: 36px; height: 36px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.9rem; font-weight: 600; margin: 0;">Webmail Access</h4>
+                                <p style="font-size: 0.7rem; color: #94a3b8; margin: 0;">Access Roundcube business mailbox.</p>
+                            </div>
+                        </a>
+
+                        <a href="admin.html" style="display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; color: inherit; text-decoration: none; text-align: left; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.borderColor='rgba(16, 185, 129, 0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.05)'">
+                            <div style="width: 36px; height: 36px; background: rgba(244, 63, 94, 0.1); color: #f43f5e; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.9rem; font-weight: 600; margin: 0;">Admin Portal</h4>
+                                <p style="font-size: 0.7rem; color: #94a3b8; margin: 0;">Superadmin panel to configure users.</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+        }
+
         // Account Modal
         const accountModal = document.getElementById('accountModal');
         const openAccountModal = document.getElementById('openAccountModal');
@@ -1587,10 +1698,23 @@
         const openAccountModalCTA = document.getElementById('openAccountModalCTA');
         const closeAccountModal = document.getElementById('closeAccountModal');
         
-        [openAccountModal, openAccountModalHero, openAccountModalCTA].forEach(btn => {
-            btn?.addEventListener('click', () => {
+        // Modal Trigger Buttons
+        const modalTriggers = [openAccountModal, openAccountModalHero, openAccountModalCTA];
+        document.querySelectorAll('.nav-link-signup').forEach(el => modalTriggers.push(el));
+
+        modalTriggers.forEach(btn => {
+            btn?.addEventListener('click', (e) => {
+                e.preventDefault();
                 if (accountModal) accountModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Login Triggers
+        document.querySelectorAll('.nav-link-login').forEach(btn => {
+            btn?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginPortal();
             });
         });
         
