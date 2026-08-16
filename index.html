@@ -224,6 +224,7 @@
             border-radius: 20px;
             font-weight: 600;
             transition: var(--transition);
+            white-space: nowrap;
         }
         
         .nav-link-login:hover {
@@ -242,6 +243,7 @@
             font-weight: 600;
             transition: var(--transition);
             box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+            white-space: nowrap;
         }
         
         .nav-link-signup:hover {
@@ -251,6 +253,18 @@
         
         .nav-link-signup::after {
             display: none !important;
+        }
+
+        .desktop-only {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 992px) {
+            .desktop-only {
+                display: none !important;
+            }
         }
 
         .nav-buttons {
@@ -1475,6 +1489,12 @@
             box-shadow: var(--shadow-lg);
         }
         
+        @media (min-width: 993px) {
+            .mobile-menu, .menu-overlay {
+                display: none !important;
+            }
+        }
+        
         .mobile-menu.active {
             right: 0;
         }
@@ -1770,22 +1790,19 @@
             </a>
             
             <nav class="desktop-nav">
-                <ul class="nav-links" style="align-items: center;">
+                <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#services">Services</a></li>
                     <li><a href="hosting.html">Hosting</a></li>
-                    <li><a href="#process">Our Process</a></li>
-                    <li><a href="#technology">Tech Stack</a></li>
                     <li><a href="#projects">Projects</a></li>
-                    <li><a href="#team">Team</a></li>
                     <li><a href="#blog">Resources</a></li>
                     <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#login" class="nav-link-login">Login</a></li>
-                    <li><a href="hosting.html#hosting" class="nav-link-signup">Sign Up</a></li>
                 </ul>
             </nav>
             
             <div class="nav-buttons">
+                <a href="#login" class="nav-link-login desktop-only">Login</a>
+                <a href="hosting.html#hosting" class="nav-link-signup desktop-only">Sign Up</a>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                     <i class="fas fa-moon"></i>
                 </button>
