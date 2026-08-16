@@ -53,27 +53,30 @@
     <style>
         /* CSS Variables for Theme */
         :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #7c3aed;
-            --dark-color: #0f172a;
+            --primary-color: #008099;
+            --primary-dark: #006677;
+            --secondary-color: #0ea5e9;
+            --accent-color: #00c2d4;
+            --dark-color: #0b2149;
             --light-color: #f8fafc;
             --gray-color: #64748b;
+            --text-light: #94a3b8;
             --success-color: #10b981;
+            --border-color: #e2e8f0;
             --border-radius: 12px;
             --transition: all 0.3s ease;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.12);
+            --shadow: 0 4px 20px rgba(0,0,0,0.07);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.10);
         }
-        
         [data-theme="dark"] {
-            --primary-color: #3b82f6;
-            --primary-dark: #60a5fa;
+            --primary-color: #00b8d4;
+            --primary-dark: #00c2d4;
             --dark-color: #f8fafc;
-            --light-color: #0f172a;
+            --light-color: #0b1a2e;
             --gray-color: #cbd5e1;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
+            --border-color: #1e3a5f;
+            --shadow: 0 10px 25px rgba(0,0,0,0.25);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.35);
         }
         
         /* Reset & Base */
@@ -105,10 +108,8 @@
         
         h1 {
             font-size: 3.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--dark-color);
+            line-height: 1.15;
         }
         
         h2 {
@@ -121,8 +122,8 @@
             content: '';
             position: absolute;
             width: 60%;
-            height: 4px;
-            background: linear-gradient(to right, var(--primary-color), transparent);
+            height: 3px;
+            background: var(--primary-color);
             bottom: -8px;
             left: 0;
             border-radius: 2px;
@@ -312,110 +313,151 @@
             box-shadow: var(--shadow-lg);
         }
         
-        /* Hero Section */
+        /* ===== NEW HERO ===== */
         .hero {
-            padding-top: 120px;
+            position: relative;
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            position: relative;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 90px;
+            padding-bottom: 160px;
             overflow: hidden;
         }
-        
-        .hero-bg {
+        .hero-bg-image {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.1), transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(124, 58, 237, 0.1), transparent 50%);
-            z-index: -1;
+            inset: 0;
+            background: url('hero_bg.jpg') center center / cover no-repeat;
+            z-index: 0;
         }
-        
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(11,33,73,0.82) 0%, rgba(0,128,153,0.45) 100%);
+            z-index: 1;
+        }
+        .hero-inner {
+            position: relative;
+            z-index: 2;
+            padding-top: 60px;
+        }
         .hero-content {
-            max-width: 600px;
+            max-width: 620px;
         }
-        
-        .hero-subtitle {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-            font-weight: 600;
+        .hero-title {
+            font-size: 3.8rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 1.2rem;
         }
-        
-        .slogan {
-            font-size: 1.5rem;
-            color: var(--gray-color);
-            margin-bottom: 30px;
+        .hero-title-accent {
+            color: #00c2d4;
         }
-        
+        .hero-desc {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 2rem;
+            max-width: 480px;
+            line-height: 1.7;
+        }
         .hero-btns {
             display: flex;
             gap: 15px;
-            margin-top: 30px;
+            margin-top: 0;
         }
-        
-        .btn-outline {
+        .btn-teal {
+            background: var(--primary-color);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-teal:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,128,153,0.35);
+        }
+        .btn-watch {
             background: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
+            color: white;
+            padding: 13px 28px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        
-        .hero-image {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50%;
-            height: 70%;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
-            border-radius: 30px 0 0 30px;
+        .btn-watch:hover {
+            border-color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        .btn-watch i {
+            width: 28px;
+            height: 28px;
+            background: white;
+            color: var(--primary-color);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            font-size: 0.7rem;
         }
-
-        .hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-        
-        .floating-element {
+        /* Metrics Bar */
+        .metrics-bar {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: var(--primary-color);
-            border-radius: 15px;
-            opacity: 0.7;
-            animation: float 6s ease-in-out infinite;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            transform: translateY(50%);
         }
-        
-        .floating-element:nth-child(1) {
-            top: 20%;
-            left: 20%;
-            background: var(--primary-color);
-            animation-delay: 0s;
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            padding: 30px 40px;
+            gap: 0;
         }
-        
-        .floating-element:nth-child(2) {
-            top: 60%;
-            left: 40%;
-            background: var(--secondary-color);
-            animation-delay: 2s;
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 20px;
+            border-right: 1px solid var(--border-color);
         }
-        
-        .floating-element:nth-child(3) {
-            top: 30%;
-            right: 30%;
-            background: var(--success-color);
-            animation-delay: 4s;
+        .metric-item:last-child {
+            border-right: none;
         }
-        
+        .metric-icon {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            opacity: 0.8;
+        }
+        .metric-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            line-height: 1;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            margin-top: 4px;
+        }
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(5deg); }
@@ -679,7 +721,7 @@
         }
         /* Services Section */
         .services-section {
-            background-color: rgba(37, 99, 235, 0.03);
+            background-color: var(--light-color);
         }
         
         .section-header {
@@ -706,7 +748,7 @@
             padding: 30px;
             box-shadow: var(--shadow);
             transition: var(--transition);
-            border: 1px solid rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
         }
@@ -718,7 +760,7 @@
             left: 0;
             width: 100%;
             height: 5px;
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
         }
         
         .service-card:hover {
@@ -738,6 +780,93 @@
             font-size: 1.5rem;
             margin-bottom: 20px;
         }
+
+        /* ===== NEW SERVICES LAYOUT ===== */
+        .services-intro {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-bottom: 50px;
+        }
+        .section-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .services-title {
+            font-size: 2.4rem;
+            color: var(--dark-color);
+            line-height: 1.2;
+        }
+        .services-title::after { display: none; }
+        .explore-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 12px;
+            transition: var(--transition);
+        }
+        .explore-link:hover { gap: 10px; }
+        .services-grid-new {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .service-card-new {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px 24px;
+            transition: var(--transition);
+        }
+        .service-card-new:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+        .sc-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+        .sc-icon-blue { background: rgba(14,165,233,0.1); color: #0ea5e9; }
+        .sc-icon-green { background: rgba(16,185,129,0.1); color: #10b981; }
+        .sc-icon-purple { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+        .sc-icon-orange { background: rgba(245,158,11,0.1); color: #f59e0b; }
+        .service-card-new h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+        .service-card-new p {
+            font-size: 0.87rem;
+            color: var(--gray-color);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .sc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .sc-link:hover { gap: 8px; }
         
         /* Expertise Section */
         .expertise-section {
@@ -1475,6 +1604,130 @@
             }
         }
         
+        /* ===== ABOUT SECTION ===== */
+        .about-section { background: var(--light-color); }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .about-title {
+            font-size: 2.4rem;
+            color: var(--dark-color);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        .about-title::after { display: none; }
+        .about-desc {
+            color: var(--gray-color);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        .about-checklist {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .about-checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        .about-checklist li i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        .about-img-wrap {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .about-img {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+            border-radius: 16px;
+            display: block;
+        }
+        .about-badge {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            max-width: 200px;
+        }
+        .about-badge-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .about-badge-text {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            line-height: 1.4;
+        }
+        .about-badge-text small { font-size: 0.75rem; }
+
+        /* ===== TRUSTED BRANDS ===== */
+        .trusted-section {
+            padding: 50px 0;
+            border-top: 1px solid var(--border-color);
+            background: white;
+        }
+        .trusted-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .trusted-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+        .trusted-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: -0.01em;
+            transition: color 0.2s;
+            cursor: default;
+        }
+        .trusted-logo:hover { color: var(--dark-color); }
+        .trusted-logo i { font-size: 1.3rem; }
+
+        /* ===== RESPONSIVE (new sections) ===== */
+        @media (max-width: 992px) {
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .services-intro { grid-template-columns: 1fr; gap: 20px; }
+            .services-grid-new { grid-template-columns: repeat(2, 1fr); }
+            .about-grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2.8rem; }
+        }
+        @media (max-width: 600px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; padding: 20px; }
+            .metric-item { border-right: none; padding: 8px 10px; }
+            .services-grid-new { grid-template-columns: 1fr; }
+            .hero-title { font-size: 2.2rem; }
+            .trusted-logos { gap: 25px; }
+        }
+
         /* Mobile Menu */
         .mobile-menu {
             position: fixed;
@@ -1836,129 +2089,137 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="hero-bg"></div>
-        <div class="container">
+        <div class="hero-bg-image"></div>
+        <div class="hero-overlay"></div>
+        <div class="container hero-inner">
             <div class="hero-content">
-                <h4 class="hero-subtitle">Welcome to LAPTER TECHNOLOGIES</h4>
-                <h1>Engineering the Future of Technology</h1>
-                <p class="slogan">We build cutting-edge software solutions that transform ideas into scalable, secure, and innovative products for the modern world.</p>
-                
+                <h1 class="hero-title">Innovating Today<br><span class="hero-title-accent">Inspiring Tomorrow</span></h1>
+                <p class="hero-desc">We deliver intelligent solutions that drive growth, empower businesses, and create lasting impact.</p>
                 <div class="hero-btns">
-                    <a href="#services" class="btn">Explore Services</a>
-                    <a href="#contact" class="btn btn-outline">Start a Project</a>
+                    <a href="#services" class="btn btn-teal">Our Services</a>
+                    <a href="#process" class="btn btn-watch"><i class="fas fa-play"></i> Watch Overview</a>
                 </div>
             </div>
-            
-            <div class="hero-image">
-                <div class="floating-element"></div>
-                <div class="floating-element"></div>
-                <div class="floating-element"></div>
+        </div>
+        <!-- Floating Metrics Bar -->
+        <div class="metrics-bar">
+            <div class="container">
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <i class="fas fa-users metric-icon"></i>
+                        <div>
+                            <div class="metric-number">500+</div>
+                            <div class="metric-label">Happy Clients</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <i class="fas fa-briefcase metric-icon"></i>
+                        <div>
+                            <div class="metric-number">1200+</div>
+                            <div class="metric-label">Projects Delivered</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <i class="fas fa-trophy metric-icon"></i>
+                        <div>
+                            <div class="metric-number">15+</div>
+                            <div class="metric-label">Awards Won</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <i class="fas fa-globe metric-icon"></i>
+                        <div>
+                            <div class="metric-number">30+</div>
+                            <div class="metric-label">Countries Served</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section class="section-padding services-section" id="services">
+    <section class="section-padding services-section" id="services" style="padding-top: 140px;">
         <div class="container">
-            <div class="section-header">
-                <h2>Our Core Services</h2>
-                <p>Comprehensive technology solutions tailored to your business needs</p>
+            <div class="services-intro">
+                <div class="services-intro-left">
+                    <p class="section-eyebrow">WHAT WE DO</p>
+                    <h2 class="services-title">Solutions that<br>Drive <span style="color: var(--primary-color);">Real Impact</span></h2>
+                </div>
+                <div class="services-intro-right">
+                    <p>From strategy to execution, we provide end-to-end services tailored to your business goals.</p>
+                    <a href="#services" class="explore-link">Explore All Services <i class="fas fa-arrow-right"></i></a>
+                </div>
             </div>
-            
-            <div class="services-grid">
-                <!-- Service 1 -->
-                <div class="service-card" data-service="custom-software">
-                    <div class="service-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <h3>Custom Software Development</h3>
-                    <p>Building tailor-made applications from scratch designed specifically for your business processes and requirements.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">.NET</span>
-                        <span class="tech-tag">Java</span>
-                        <span class="tech-tag">Python</span>
-                        <span class="tech-tag">Node.js</span>
+
+            <div class="services-grid-new">
+                <div class="service-card-new">
+                    <div class="sc-icon sc-icon-blue"><i class="fas fa-rocket"></i></div>
+                    <h4>Digital Transformation</h4>
+                    <p>Modernize your business with cutting-edge digital solutions.</p>
+                    <a href="#contact" class="sc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card-new">
+                    <div class="sc-icon sc-icon-green"><i class="fas fa-briefcase"></i></div>
+                    <h4>IT Consulting</h4>
+                    <p>Expert guidance to optimize systems and drive efficiency.</p>
+                    <a href="#contact" class="sc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card-new">
+                    <div class="sc-icon sc-icon-purple"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h4>Cloud Solutions</h4>
+                    <p>Scalable and secure cloud solutions for the modern enterprise.</p>
+                    <a href="hosting.html" class="sc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="service-card-new">
+                    <div class="sc-icon sc-icon-orange"><i class="fas fa-lightbulb"></i></div>
+                    <h4>Data &amp; Analytics</h4>
+                    <p>Turn data into actionable insights and accelerate growth.</p>
+                    <a href="#contact" class="sc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section-padding about-section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-left">
+                    <p class="section-eyebrow">ABOUT LAPTER TECHNOLOGIES</p>
+                    <h2 class="about-title">Your Trusted Partner<br>for <span style="color: var(--primary-color);">Sustainable Growth</span></h2>
+                    <p class="about-desc">At Lapter Technologies, we combine innovation, expertise, and collaboration to help businesses unlock new opportunities and achieve long-term success.</p>
+                    <ul class="about-checklist">
+                        <li><i class="fas fa-check-circle"></i> Client-Centric Approach</li>
+                        <li><i class="fas fa-check-circle"></i> Proven Track Record</li>
+                        <li><i class="fas fa-check-circle"></i> Commitment to Excellence</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-teal" style="margin-top: 24px;">Learn More About Us</a>
+                </div>
+                <div class="about-right">
+                    <div class="about-img-wrap">
+                        <img src="about_building.jpg" alt="Lapter Technologies Office" class="about-img">
+                        <div class="about-badge">
+                            <div class="about-badge-number">15+</div>
+                            <div class="about-badge-text">Years of Experience<br><small>Delivering value and building lasting partnerships.</small></div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Service 2 -->
-                <div class="service-card" data-service="mobile">
-                    <div class="service-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Mobile App Development</h3>
-                    <p>iOS, Android, and Cross-platform solutions with native performance and engaging user experiences.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Swift</span>
-                        <span class="tech-tag">Kotlin</span>
-                        <span class="tech-tag">Flutter</span>
-                        <span class="tech-tag">React Native</span>
-                    </div>
-                </div>
-                
-                <!-- Service 3 -->
-                <div class="service-card" data-service="web">
-                    <div class="service-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <h3>Web Application Development</h3>
-                    <p>Scalable, secure, and responsive web platforms built with modern frameworks and cloud technologies.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">React</span>
-                        <span class="tech-tag">Vue.js</span>
-                        <span class="tech-tag">Angular</span>
-                        <span class="tech-tag">Cloud</span>
-                    </div>
-                </div>
-                
-                <!-- Service 4 -->
-                <div class="service-card" data-service="api">
-                    <div class="service-icon">
-                        <i class="fas fa-plug"></i>
-                    </div>
-                    <h3>API Development & Integration</h3>
-                    <p>Connecting different software systems to talk to each other seamlessly with robust and secure APIs.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">REST</span>
-                        <span class="tech-tag">GraphQL</span>
-                        <span class="tech-tag">Webhooks</span>
-                        <span class="tech-tag">WebSocket</span>
-                    </div>
-                </div>
-                
-                <!-- Service 5 -->
-                <div class="service-card" data-service="mvp">
-                    <div class="service-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3>Product Prototyping (MVP)</h3>
-                    <p>Building "Minimum Viable Products" for startups to validate ideas and secure funding quickly.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Rapid Prototyping</span>
-                        <span class="tech-tag">User Testing</span>
-                        <span class="tech-tag">Agile</span>
-                        <span class="tech-tag">Lean Startup</span>
-                    </div>
-                </div>
-                                <!-- Web Hosting Service -->
-                <div class="service-card" data-service="hosting">
-                    <div class="service-icon">
-                        <i class="fas fa-server"></i>
-                    </div>
-                    <h3>Web Hosting Solutions</h3>
-                    <p>Reliable, high-performance hosting with 99.9% uptime, SSL certificates, and 24/7 technical support for all your websites.</p>
-                    <div class="tech-tags">
-                        <span class="tech-tag">Cloud</span>
-                        <span class="tech-tag">SSL</span>
-                        <span class="tech-tag">CDN</span>
-                        <span class="tech-tag">Backup</span>
-                        <span class="tech-tag">Domain</span>
-                    </div>
-                    <a href="hosting.html" class="service-button">
-                        <span>View Hosting Plans</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trusted Brands Section -->
+    <section class="trusted-section">
+        <div class="container">
+            <p class="trusted-label">TRUSTED BY LEADING BRANDS</p>
+            <div class="trusted-logos">
+                <span class="trusted-logo"><i class="fab fa-google"></i> Google</span>
+                <span class="trusted-logo"><i class="fab fa-microsoft"></i> Microsoft</span>
+                <span class="trusted-logo"><i class="fab fa-amazon"></i> Amazon</span>
+                <span class="trusted-logo"><i class="fab fa-ibm"></i> IBM</span>
+                <span class="trusted-logo"><i class="fas fa-building"></i> Oracle</span>
+                <span class="trusted-logo"><i class="fas fa-headset"></i> Zendesk</span>
             </div>
         </div>
     </section>
