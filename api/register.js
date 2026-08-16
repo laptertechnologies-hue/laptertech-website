@@ -137,7 +137,7 @@ module.exports = async (req, res) => {
         mailboxLimit: maxMailboxes,
         storageQuota: `${mailboxStorage || 5} GB`,
         controlPanel: 'https://162.35.98.198:8083',
-        webmail: 'https://162.35.98.198:8083/webmail/'
+        webmail: 'https://162.35.98.198/webmail/'
       });
 
     } else {
@@ -184,7 +184,7 @@ module.exports = async (req, res) => {
         dbUser: dbUser,
         dbPassword: password,
         controlPanel: 'https://162.35.98.198:8083',
-        webmail: 'https://162.35.98.198:8083/webmail/'
+        webmail: 'https://162.35.98.198/webmail/'
       });
     }
 
