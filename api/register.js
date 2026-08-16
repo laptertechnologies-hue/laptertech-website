@@ -1,4 +1,38 @@
 const https = require('https');
+const nodemailer = require('nodemailer');
+
+async function sendWelcomeEmail(userEmail, details) {
+  const transporter = nodemailer.createTransport({
+    host: 'mail.laptertech.store',
+    port: 465,
+    secure: true,
+    auth: {
+      user: 'info@laptertech.store',
+      pass: 'LapterMail2026!'
+    }
+  });
+
+  const htmlContent = `
+    <h2>Welcome to Lapter Technologies Hosting!</h2>
+    <p>Your account has been successfully provisioned. Here are your login details:</p>
+    <ul>
+      <li><strong>Username:</strong> ${details.username}</li>
+      <li><strong>Password:</strong> ${details.password}</li>
+      <li><strong>Domain:</strong> ${details.domain}</li>
+      <li><strong>Control Panel:</strong> <a href="${details.controlPanel}">${details.controlPanel}</a></li>
+      <li><strong>Webmail:</strong> <a href="${details.webmail}">${details.webmail}</a></li>
+    </ul>
+    <p>Please keep these credentials safe.</p>
+    <p>Best Regards,<br>The Lapter Technologies Team</p>
+  `;
+
+  await transporter.sendMail({
+    from: '"Lapter Technologies" <info@laptertech.store>',
+    to: userEmail,
+    subject: 'Your Lapter Technologies Account Details',
+    html: htmlContent
+  });
+}
 
 function callHestia(cmd, args = []) {
   return new Promise((resolve, reject) => {
@@ -125,7 +159,7 @@ module.exports = async (req, res) => {
         });
       } catch (e) {}
 
-      return res.status(200).json({
+      const responseDetails = {
         success: true,
         serviceType: 'email-only',
         username: username,
@@ -136,9 +170,13 @@ module.exports = async (req, res) => {
         emailPassword: password,
         mailboxLimit: maxMailboxes,
         storageQuota: `${mailboxStorage || 5} GB`,
-        controlPanel: 'https://162.35.98.198:8083',
-        webmail: 'https://162.35.98.198/webmail/'
-      });
+        controlPanel: 'https://laptertech.store:8083',
+        webmail: 'http://laptertech.store/webmail/'
+      };
+
+      try { await sendWelcomeEmail(email, responseDetails); } catch (e) { console.error("Email failed:", e); }
+
+      return res.status(200).json(responseDetails);
 
     } else {
       // Setup Full Web Hosting (Default)
@@ -171,7 +209,7 @@ module.exports = async (req, res) => {
         });
       } catch (e) {}
 
-      return res.status(200).json({
+      const responseDetails = {
         success: true,
         serviceType: 'web-hosting',
         username: username,
@@ -183,9 +221,13 @@ module.exports = async (req, res) => {
         dbName: dbName,
         dbUser: dbUser,
         dbPassword: password,
-        controlPanel: 'https://162.35.98.198:8083',
-        webmail: 'https://162.35.98.198/webmail/'
-      });
+        controlPanel: 'https://laptertech.store:8083',
+        webmail: 'http://laptertech.store/webmail/'
+      };
+
+      try { await sendWelcomeEmail(email, responseDetails); } catch (e) { console.error("Email failed:", e); }
+
+      return res.status(200).json(responseDetails);
     }
 
   } catch (error) {
