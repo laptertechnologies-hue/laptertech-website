@@ -69,16 +69,19 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // 1. Create a unique username
     const emailPrefix = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     const uniqueSuffix = Math.floor(1000 + Math.random() * 9000);
     const username = (emailPrefix.substring(0, 8) + uniqueSuffix).substring(0, 12);
 
+    // 2. Generate a secure random password
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let password = '';
     for (let i = 0; i < 12; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
+    // 3. Create User account
     const userRes = await callHestia('v-add-user', [username, password, email]);
     if (userRes.exitCode > 0) {
       return res.status(500).json({ 
@@ -89,15 +92,19 @@ module.exports = async (req, res) => {
 
     const clientDomain = domain ? domain.trim() : `${username}.laptertech.store`;
 
+    // 4. Create Web Domain & Mail Domain
     await callHestia('v-add-web-domain', [username, clientDomain]);
     await callHestia('v-add-mail-domain', [username, clientDomain]);
 
-    const mailAccountRes = await callHestia('v-add-mail-account', [
-      username, 
-      clientDomain, 
-      'info', 
-      password
-    ]);
+    // 5. Create default email mailbox (info@)
+    await callHestia('v-add-mail-account', [username, clientDomain, 'info', password]);
+
+    // 6. Create MySQL Database
+    const dbNameSuffix = 'db1';
+    const dbUserSuffix = 'user1';
+    const dbName = `${username}_${dbNameSuffix}`;
+    const dbUser = `${username}_${dbUserSuffix}`;
+    await callHestia('v-add-database', [username, dbNameSuffix, dbUserSuffix, password]);
 
     // Send copy of credentials to the admin email using FormSubmit.co
     try {
@@ -114,7 +121,9 @@ module.exports = async (req, res) => {
               email: email,
               plan: plan,
               domain: clientDomain,
-              password: password
+              password: password,
+              database: dbName,
+              dbUser: dbUser
           }),
           signal: id.signal
       });
@@ -131,7 +140,11 @@ module.exports = async (req, res) => {
       emailServer: 'mail.laptertech.store',
       emailAccount: `info@${clientDomain}`,
       emailPassword: password,
-      controlPanel: 'https://162.35.98.198:8083'
+      dbName: dbName,
+      dbUser: dbUser,
+      dbPassword: password,
+      controlPanel: 'https://162.35.98.198:8083',
+      webmail: 'https://162.35.98.198:8083/webmail/'
     });
 
   } catch (error) {

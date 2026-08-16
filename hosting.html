@@ -1599,6 +1599,89 @@
             });
         });
         
+        // Success Modal Generator
+        function showSuccessModal(data, fullName, email) {
+            const existing = document.getElementById('successDetailsModal');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'successDetailsModal';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.96);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+                font-family: 'Inter', sans-serif;
+            `;
+
+            overlay.innerHTML = `
+                <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; width: 100%; max-width: 580px; padding: 30px; color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 10px auto;">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                        <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">Account Active & Provisioned!</h3>
+                        <p style="color: #94a3b8; font-size: 0.85rem;">Welcome aboard, ${fullName}! Your server space is ready.</p>
+                    </div>
+
+                    <div style="display: grid; gap: 15px; margin-bottom: 25px; text-align: left;">
+                        <!-- Step 1 -->
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-network-wired"></i> Step 1: Connect your Domain</h4>
+                            <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Update your domain nameservers or add these DNS A records at your registrar (e.g. GoDaddy):</p>
+                            <div style="background: #0f172a; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 0.75rem; color: #38bdf8; line-height: 1.4;">
+                                A Record &nbsp;&nbsp; @ &nbsp;&nbsp; 162.35.98.198<br>
+                                CNAME &nbsp;&nbsp;&nbsp;&nbsp; www &nbsp; @
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-sliders"></i> Step 2: Hosting Control Panel</h4>
+                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">URL:</td><td><a href="${data.controlPanel}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.controlPanel}</a></td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Username:</td><td style="font-weight: 600; color: #38bdf8;">${data.username}</td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.password}</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-database"></i> Step 3: MySQL Database</h4>
+                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Database:</td><td style="font-weight: 600;">${data.dbName}</td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">DB User:</td><td style="font-weight: 600;">${data.dbUser}</td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">DB Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.dbPassword}</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-envelope"></i> Step 4: Business Email & Webmail</h4>
+                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Webmail URL:</td><td><a href="${data.webmail}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.webmail}</a></td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Email Address:</td><td style="font-weight: 600; color: #38bdf8;">${data.emailAccount}</td></tr>
+                                <tr><td style="padding: 3px 0; color: #94a3b8;">Email Pass:</td><td style="font-family: monospace; color: #f43f5e;">${data.emailPassword}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button onclick="document.getElementById('successDetailsModal').remove()" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 10px 20px; font-size: 0.9rem;">
+                        <i class="fas fa-check"></i> I have saved these credentials
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+        }
+
         // Form Submission
         const accountForm = document.getElementById('accountForm');
         
@@ -1637,10 +1720,10 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert(`✅ Hosting Account Active!\n\nWelcome ${fullName}!\n\nHere are your account credentials (save them):\n• Username: ${data.username}\n• Password: ${data.password}\n• Domain: ${data.domain}\n• Default Mailbox: ${data.emailAccount}\n• Control Panel: ${data.controlPanel}\n\nWe have sent your details to ${email}.`);
                     accountForm.reset();
                     accountModal.style.display = 'none';
                     document.body.style.overflow = 'auto';
+                    showSuccessModal(data, fullName, email);
                 } else {
                     alert(`❌ Error: ${data.error || 'Failed to provision account.'}\nDetails: ${data.details || ''}`);
                 }
