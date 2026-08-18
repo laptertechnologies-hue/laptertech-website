@@ -237,7 +237,7 @@ module.exports = async (req, res) => {
         mailboxLimit: maxMailboxes,
         storageQuota: `${mailboxStorage || 5} GB`,
         controlPanel: 'https://mail.laptertech.store:8083',
-        webmail: 'http://mail.laptertech.store/webmail/'
+        webmail: 'https://webmail.laptertech.store'
       };
 
       try { await sendWelcomeEmail(email, name, responseDetails); } catch (e) { console.error("Email failed:", e); }
@@ -288,7 +288,7 @@ module.exports = async (req, res) => {
         dbUser: dbUser,
         dbPassword: password,
         controlPanel: 'https://mail.laptertech.store:8083',
-        webmail: 'http://mail.laptertech.store/webmail/'
+        webmail: 'https://webmail.laptertech.store'
       };
 
       try { await sendWelcomeEmail(email, name, responseDetails); } catch (e) { console.error("Email failed:", e); }
