@@ -1374,8 +1374,108 @@
                         Select Email Plan
                     </button>
                 </div>
-                
-                
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Email & Mobile Setup Guide Section -->
+    <section class="section-padding email-guide-section" id="email-setup" style="background: var(--light-color); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+                <p style="font-size: 0.8rem; font-weight: 700; color: var(--primary-color); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px;">EASY MAIL INTEGRATION</p>
+                <h2 style="font-size: 2.3rem; color: var(--dark-color); margin-bottom: 12px;">How to Connect Custom Email to Your Phone & Devices</h2>
+                <p style="color: var(--gray-color); max-width: 650px; margin: 0 auto; line-height: 1.6;">Get your custom company emails (e.g. <code>name@yourdomain.com</code>) synced seamlessly across iPhone, Android, Outlook, and Webmail in minutes.</p>
+            </div>
+
+            <!-- Server Settings Summary Box -->
+            <div style="background: linear-gradient(135deg, var(--dark-color) 0%, #004d5a 100%); border-radius: 16px; padding: 32px; color: white; margin-bottom: 45px; box-shadow: var(--shadow-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 20px; margin-bottom: 24px;">
+                    <div>
+                        <h3 style="font-size: 1.4rem; color: white; margin-bottom: 4px;"><i class="fas fa-server" style="color: var(--accent-color); margin-right: 10px;"></i>Universal Server Settings</h3>
+                        <p style="font-size: 0.88rem; color: rgba(255,255,255,0.8); margin: 0;">Use these exact incoming & outgoing server parameters for any device or email client.</p>
+                    </div>
+                    <a href="http://162.35.98.198/webmail/" target="_blank" style="background: var(--primary-color); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition);">
+                        <i class="fas fa-external-link-alt"></i> Open Webmail Directly
+                    </a>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.07); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-color); font-weight: 700; margin-bottom: 6px;">Incoming Server (IMAP)</div>
+                        <div style="font-family: monospace; font-size: 0.95rem; font-weight: 600;">mail.laptertech.store</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px;">Port: <strong>993</strong> (SSL/TLS)</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.07); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-color); font-weight: 700; margin-bottom: 6px;">Outgoing Server (SMTP)</div>
+                        <div style="font-family: monospace; font-size: 0.95rem; font-weight: 600;">mail.laptertech.store</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px;">Port: <strong>587</strong> (STARTTLS / TLS)</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.07); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-color); font-weight: 700; margin-bottom: 6px;">Username & Auth</div>
+                        <div style="font-family: monospace; font-size: 0.95rem; font-weight: 600;">Full Email Address</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px;">e.g. <code>info@yourdomain.com</code></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile & Device Setup Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px;">
+                <!-- iPhone Setup Card -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 14px; padding: 30px; box-shadow: var(--shadow); transition: var(--transition);">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(11,33,73,0.08); color: var(--dark-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                            <i class="fab fa-apple"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.15rem; color: var(--dark-color); margin: 0;">iPhone & iPad Setup</h4>
+                            <span style="font-size: 0.78rem; color: var(--gray-color);">Apple Mail App</span>
+                        </div>
+                    </div>
+                    <ol style="margin: 0; padding-left: 20px; color: var(--gray-color); font-size: 0.9rem; line-height: 1.8;">
+                        <li>Open <strong style="color: var(--dark-color);">Settings ⚙️</strong> &rarr; <strong style="color: var(--dark-color);">Mail</strong> &rarr; <strong style="color: var(--dark-color);">Accounts</strong>.</li>
+                        <li>Tap <strong style="color: var(--dark-color);">Add Account</strong> &rarr; Choose <strong style="color: var(--dark-color);">Other</strong>.</li>
+                        <li>Tap <strong style="color: var(--dark-color);">Add Mail Account</strong> and enter your name, email (e.g. <code>info@yourdomain.com</code>), and password.</li>
+                        <li>Select <strong style="color: var(--dark-color);">IMAP</strong> and set Server to <code>mail.laptertech.store</code> for both Incoming & Outgoing.</li>
+                        <li>Tap <strong style="color: var(--dark-color);">Save</strong>. iPhone will verify and start syncing!</li>
+                    </ol>
+                </div>
+
+                <!-- Android Setup Card -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 14px; padding: 30px; box-shadow: var(--shadow); transition: var(--transition);">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16,185,129,0.1); color: var(--hosting-green); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                            <i class="fab fa-android"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.15rem; color: var(--dark-color); margin: 0;">Android Setup</h4>
+                            <span style="font-size: 0.78rem; color: var(--gray-color);">Gmail App / Samsung Mail</span>
+                        </div>
+                    </div>
+                    <ol style="margin: 0; padding-left: 20px; color: var(--gray-color); font-size: 0.9rem; line-height: 1.8;">
+                        <li>Open <strong style="color: var(--dark-color);">Gmail App</strong> &rarr; Tap profile icon &rarr; <strong style="color: var(--dark-color);">Add another account</strong>.</li>
+                        <li>Choose <strong style="color: var(--dark-color);">Other</strong> &rarr; enter your email &rarr; tap <strong style="color: var(--dark-color);">Manual Setup</strong>.</li>
+                        <li>Select <strong style="color: var(--dark-color);">Personal (IMAP)</strong> and enter your email password.</li>
+                        <li>Set Server to <code>mail.laptertech.store</code>, Port <code>993</code> (SSL/TLS).</li>
+                        <li>Set Outgoing SMTP Server to <code>mail.laptertech.store</code>, Port <code>587</code> &rarr; Tap <strong style="color: var(--dark-color);">Done</strong>!</li>
+                    </ol>
+                </div>
+
+                <!-- Webmail & Outlook Setup Card -->
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 14px; padding: 30px; box-shadow: var(--shadow); transition: var(--transition);">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(14,165,233,0.1); color: var(--secondary-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1.15rem; color: var(--dark-color); margin: 0;">Webmail & PC Access</h4>
+                            <span style="font-size: 0.78rem; color: var(--gray-color);">Roundcube & Outlook</span>
+                        </div>
+                    </div>
+                    <ul style="margin: 0; padding-left: 20px; color: var(--gray-color); font-size: 0.9rem; line-height: 1.8; list-style-type: square;">
+                        <li><strong style="color: var(--dark-color);">Instant Webmail:</strong> Go to <a href="http://162.35.98.198/webmail/" target="_blank" style="color: var(--primary-color); font-weight: 600;">162.35.98.198/webmail</a> from any phone or PC browser.</li>
+                        <li><strong style="color: var(--dark-color);">Microsoft Outlook:</strong> Choose File &rarr; Add Account &rarr; Manual setup &rarr; IMAP &rarr; enter server parameters above.</li>
+                        <li><strong style="color: var(--dark-color);">Spam Filtered:</strong> Powered by MailBaby relay for 99.9% inbox deliverability.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
