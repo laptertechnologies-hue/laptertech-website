@@ -1,0 +1,5 @@
+
+*.py
+*.js
+!sw.js
+!api/*.js

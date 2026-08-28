@@ -713,13 +713,17 @@
             position: fixed;
             top: 0;
             right: -100%;
-            width: 300px;
+            width: 280px;
+            max-width: 85vw;
             height: 100vh;
             background: var(--light-color);
             z-index: 1001;
-            padding: 80px 30px 30px;
+            padding: 55px 20px 25px;
             transition: var(--transition);
             box-shadow: var(--shadow-lg);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         
         @media (min-width: 993px) {
@@ -734,27 +738,51 @@
         
         .mobile-menu-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.05);
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--dark-color);
             cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .mobile-menu-close:hover {
+            background: rgba(0, 0, 0, 0.1);
         }
         
         .mobile-nav-links {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 4px;
         }
         
-        .mobile-nav-links a {
+        .mobile-nav-links li {
+            width: 100%;
+        }
+
+        .mobile-nav-links a.mobile-nav-link {
             text-decoration: none;
             color: var(--dark-color);
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: 500;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .mobile-nav-links a.mobile-nav-link:hover {
+            background: rgba(0, 128, 153, 0.08);
+            color: var(--primary-color);
         }
         
         .menu-overlay {
