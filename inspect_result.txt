@@ -1,0 +1,1257 @@
+===EXIM_TEMPLATE===
+######################################################################
+#                                                                    #
+#          Exim configuration file for Hestia Control Panel          #
+#                                                                    #
+######################################################################
+
+#SPAMASSASSIN = yes
+#SPAM_SCORE = 50
+#SPAM_REJECT_SCORE = 100
+#CLAMD = yes
+
+smtp_banner = $smtp_active_hostname ESMTP
+smtp_active_hostname = ${lookup dnsdb{>: defer_never,ptr=$interface_address}{${listextract{1}{$value}}}{$primary_hostname}}
+add_environment = <; PATH=/bin:/usr/bin
+keep_environment =
+disable_ipv6 = true
+smtp_accept_max = 100
+smtp_accept_max_per_host = 20
+
+smtputf8_advertise_hosts =
+domainlist local_domains = dsearch;/etc/exim4/domains/
+domainlist relay_to_domains = dsearch;/etc/exim4/domains/
+hostlist relay_from_hosts = 127.0.0.1
+hostlist whitelist = net-iplsearch;/etc/exim4/white-blocks.conf
+hostlist spammers = net-iplsearch;/etc/exim4/spam-blocks.conf
+no_local_from_check
+untrusted_set_sender = *
+acl_smtp_connect = acl_check_spammers
+acl_smtp_mail = acl_check_mail
+acl_smtp_rcpt = acl_check_rcpt
+acl_smtp_data = acl_check_data
+acl_smtp_mime = acl_check_mime
+
+.ifdef SPAMASSASSIN
+spamd_address = 127.0.0.1 783
+.endif
+
+.ifdef CLAMD
+av_scanner = clamd: /run/clamav/clamd.ctl
+.endif
+
+log_selector = +tls_sni
+
+tls_advertise_hosts = *
+
+# We test that $tls_in_sni is a valid domain, by an arbitrary email address foo@domain.tld .
+# Then, we extract the domain with a function that would fail if the email address is invalid.
+# If the certificate exists, we will use it, otherwise the default certificate in /etc/ssl will be used.
+tls_certificate = \
+        ${if and {\
+                     { eq {${domain:foo@$tls_in_sni}} {$tls_in_sni}}\
+                     { exists{/usr/local/hestia/ssl/mail/$tls_in_sni.crt} }\
+                 }\
+                 {/usr/local/hestia/ssl/mail/$tls_in_sni.crt}\
+                 {/usr/local/hestia/ssl/certificate.crt}\
+         }
+
+tls_privatekey = \
+        ${if and {\
+                     { eq {${domain:foo@$tls_in_sni}} {$tls_in_sni}}\
+                     { exists{/usr/local/hestia/ssl/mail/$tls_in_sni.key} }\
+                 }\
+                 {/usr/local/hestia/ssl/mail/$tls_in_sni.key}\
+                 {/usr/local/hestia/ssl/certificate.key}\
+         }
+
+daemon_smtp_ports = 25 : 465 : 587
+tls_on_connect_ports = 465
+tls_require_ciphers = PERFORMANCE:-RSA:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3:%SERVER_PRECEDENCE
+auth_advertise_hosts = localhost : ${if eq{$tls_in_cipher}{}{}{*}}
+never_users = root
+host_lookup = *
+rfc1413_hosts = *
+rfc1413_query_timeout = 0s
+ignore_bounce_errors_after = 2d
+timeout_frozen_after = 7d
+
+DKIM_DOMAIN = ${lc:${domain:$h_from:}}
+DKIM_FILE = /etc/exim4/domains/${lc:${domain:$h_from:}}/dkim.pem
+DKIM_PRIVATE_KEY = ${if exists{DKIM_FILE}{DKIM_FILE}{0}}
+
+OUTGOING_IP = /etc/exim4/domains/${sg{$sender_address_domain}{[^a-zA-Z0-9._-]}{}}/ip
+
+SMTP_RELAY_FILE = /etc/exim4/smtp_relay.conf
+SMTP_RELAY_HOST = ${lookup{host}lsearch{SMTP_RELAY_FILE}}
+SMTP_RELAY_PORT = ${lookup{port}lsearch{SMTP_RELAY_FILE}}
+SMTP_RELAY_USER = ${lookup{user}lsearch{SMTP_RELAY_FILE}}
+SMTP_RELAY_PASS = ${lookup{pass}lsearch{SMTP_RELAY_FILE}}
+
+# Custom Filter
+system_filter = /etc/exim4/system.filter
+system_filter_user = Debian-exim
+
+######################################################################
+#                       ACL CONFIGURATION                            #
+#         Specifies access control lists for incoming SMTP mail      #
+######################################################################
+
+acl_not_smtp = acl_not_smtp
+
+begin acl
+
+# Limit per user for PHP scripts
+acl_not_smtp:
+  deny    message       = Website of user $authenticated_id is sending too many emails - rate overlimit = $sender_rate / $sender_rate_period
+  ratelimit             = 200 / 1h / $authenticated_id
+
+  warn    ratelimit     = 100 / 1h / strict / $authenticated_id
+  log_message           = Sender rate [limitlog]: log / account / $authenticated_id / $sender_rate / $sender_rate_period
+
+  accept
+
+acl_check_spammers:
+  accept  hosts         = +whitelist
+
+  drop    message       = Your host in blacklist on this server.
+          log_message   = Host in blacklist
+          hosts         = +spammers
+
+  accept
+
+
+acl_check_mail:
+  deny  condition     = ${if eq{$sender_helo_name}{}}
+        message       = HELO required before MAIL
+
+  drop  !authenticated = *
+		message       =  Helo name contains an IP address (HELO was $sender_helo_name) and not is valid
+		condition     = ${if match{$sender_helo_name}{\N((\d{1,3}[.-]\d{1,3}[.-]\d{1,3}[.-]\d{1,3})|([0-9a-f]{8})|([0-9A-F]{8}))\N}{yes}{no}}
+		condition     = ${if match {${lookup dnsdb{>: defer_never,ptr=$sender_host_address}}\}{$sender_helo_name}{no}{yes}}
+		delay         = 45s
+
+  drop  !authenticated = *
+		condition     = ${if isip{$sender_helo_name}}
+		message       = Access denied - Invalid HELO name (See RFC2821 4.1.3)
+
+  drop  !authenticated = *
+		condition    = ${if eq{[$interface_address]}{$sender_helo_name}}
+		message       = $interface_address is _my_ address
+
+  accept
+
+
+acl_check_rcpt:
+  accept  hosts         = :
+
+# Limit per email account for SMTP auhenticated users
+  deny    message       = Email account $authenticated_id is sending too many emails - rate overlimit = $sender_rate / $sender_rate_period
+      set acl_c_msg_limit  = ${if exists{/etc/exim4/domains/${lookup{${domain:$authenticated_id}}dsearch{/etc/exim4/domains/}}/limits}{${lookup {$authenticated_id} lsearch{/etc/exim4/domains/${lookup{${domain:$authenticated_id}}dsearch{/etc/exim4/domains/}}/limits}{$value}{${readfile{/etc/exim4/limit.conf}}}}}{${readfile{/etc/exim4/limit.conf}}} }
+          ratelimit     = $acl_c_msg_limit / 1h / strict/ $authenticated_id
+
+  warn    ratelimit     = ${eval:$acl_c_msg_limit / 2} / 1h / strict / $authenticated_id
+          log_message           = Sender rate [limitlog]: log / email / $authenticated_id / $sender_rate / $sender_rate_period
+
+  deny    message       = Restricted characters in address
+          domains       = +local_domains
+          local_parts   = ^[.] : ^.*[@%!/|]
+
+  deny    message       = Restricted characters in address
+          domains       = !+local_domains
+          local_parts   = ^[./|] : ^.*[@%!] : ^.*/\\.\\./
+
+  require verify        = sender
+
+  accept  hosts         = +relay_from_hosts
+          control       = submission
+
+  accept  authenticated = *
+          control       = submission/domain=
+
+  deny    message       = Rejected because $sender_host_address is in a black list at ${if match{$dnslist_domain}{^[^.]+[.](.+dq[.]spamhaus.*)}{$1}{$dnslist_domain}}\n$dnslist_text
+          hosts         = !+whitelist
+          dnslists      = ${readfile {/etc/exim4/dnsbl.conf}{:}}
+
+  require message       = relay not permitted
+          domains       = +local_domains : +relay_to_domains
+
+  deny    message       = smtp auth required
+         sender_domains = +local_domains
+         !authenticated = *
+
+  require verify        = recipient
+
+.ifdef CLAMD
+  warn    set acl_m0    = no
+
+  warn    condition     = ${if exists {/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/antivirus}{yes}{no}}
+          set acl_m0    = yes
+.endif
+
+.ifdef SPAMASSASSIN
+  warn    set acl_m1    = no
+          set acl_m3    = no
+  warn    condition     = ${if exists {/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/antispam}{yes}{no}}
+          set acl_m1    = yes
+  warn    condition     = ${if exists {/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/reject_spam}{yes}{no}}
+          set acl_m3    = yes
+.endif
+
+
+  accept
+
+
+acl_check_data:
+.ifdef CLAMD
+  deny   message        = Message contains a virus ($malware_name) and has been rejected
+         malware        = */defer_ok
+         condition      = ${if eq{$acl_m0}{yes}{yes}{no}}
+.endif
+
+.ifdef SPAMASSASSIN
+  warn   !authenticated = *
+         hosts          = !+relay_from_hosts
+         condition      = ${if < {$message_size}{1024K}}
+         condition      = ${if eq{$acl_m1}{yes}{yes}{no}}
+         spam           = debian-spamd:true/defer_ok
+         add_header     = X-Spam-Score: $spam_score_int
+         add_header     = X-Spam-Bar: $spam_bar
+         add_header     = X-Spam-Report: $spam_report
+         set acl_m2     = $spam_score_int
+
+  warn   condition      = ${if !eq{$acl_m2}{} {yes}{no}}
+         condition      = ${if >{$acl_m2}{SPAM_SCORE} {yes}{no}}
+         add_header     = X-Spam-Status: Yes
+         message        = SpamAssassin detected spam (from $sender_address to $recipients).
+
+  # Deny spam at high score if spam score > SPAM_REJECT_SCORE and delete_spam is enabled
+  deny   message        = This message scored $spam_score spam points
+         condition      = ${if eq{$acl_m3}{yes}{yes}{no}}
+         spam           = debian-spamd:true
+         condition      = ${if >{$spam_score_int}{SPAM_REJECT_SCORE}{1}{0}}
+.endif
+
+
+  accept
+
+
+acl_check_mime:
+  deny   message        = Blacklisted file extension detected
+         condition      = ${if match {${lc:$mime_filename}}{\N(\.ace|\.ade|\.adp|\.app|\.arj|\.asp|\.aspx|\.asx|\.bas|\.bat|\.cab|\.cer|\.chm|\.cmd|\.cnt|\.com|\.cpl|\.crt|\.csh|\.der|\.diagcab|\.dll|\.efi|\.exe|\.fla|\.fon|\.fxp|\.gadget|\.grp|\.hlp|\.hpj|\.hta|\.htc|\.img|\.inf|\.ins|\.iso|\.isp|\.its|\.jar|\.jnlp|\.js|\.jse|\.ksh|\.lib|\.lnk|\.mad|\.maf|\.mag|\.mam|\.maq|\.mar|\.mas|\.mat|\.mau|\.mav|\.maw|\.mcf|\.mda|\.mdb|\.mde|\.mdt|\.mdw|\.mdz|\.msc|\.msh|\.msh1|\.msh1xml|\.msh2|\.msh2xml|\.mshxml|\.msi|\.msp|\.mst|\.msu|\.ops|\.osd|\.pcd|\.pif|\.pl|\.plg|\.prf|\.prg|\.printerexport|\.ps1|\.ps1xml|\.ps2|\.ps2xml|\.psc1|\.psc2|\.psd1|\.psdm1|\.pst|\.py|\.pyc|\.pyo|\.pyw|\.pyz|\.pyzw|\.reg|\.scf|\.scr|\.sct|\.sfx|\.shb|\.shs|\.swf|\.sys|\.theme|\.tmp|\.ttf|\.url|\.vb|\.vba|\.vbe|\.vbp|\.vbs|\.vhd|\.vhdx|\.vsmacros|\.vsw|\.vxd|\.webpnp|\.website|\.wim|\.ws|\.wsc|\.wsf|\.wsh|\.xbap|\.xll|\.xnk)$\N}{1}{0}}
+
+  accept
+
+
+
+######################################################################
+#                   AUTHENTICATION CONFIGURATION                     #
+######################################################################
+begin authenticators
+
+smtp_relay_login:
+  driver = plaintext
+  public_name = LOGIN
+  hide client_send = : SMTP_RELAY_USER : SMTP_RELAY_PASS
+
+dovecot_plain:
+  driver = dovecot
+  public_name = PLAIN
+  server_socket = /run/dovecot/auth-client
+  server_set_id = $auth1
+
+dovecot_login:
+  driver = dovecot
+  public_name = LOGIN
+  server_socket = /run/dovecot/auth-client
+  server_set_id = $auth1
+
+
+
+######################################################################
+#                      ROUTERS CONFIGURATION                         #
+#               Specifies how addresses are handled                  #
+######################################################################
+begin routers
+
+send_via_unauthenticated_smtp_relay:
+  driver = manualroute
+  address_data = SMTP_RELAY_HOST:SMTP_RELAY_PORT
+  domains = !+local_domains
+  require_files = SMTP_RELAY_FILE
+  condition = ${if eq{SMTP_RELAY_USER}{}}
+  transport = remote_smtp
+  route_list = * ${extract{1}{:}{$address_data}}::${extract{2}{:}{$address_data}}
+  no_more
+  no_verify
+
+send_via_smtp_relay:
+  driver = manualroute
+  address_data = SMTP_RELAY_HOST:SMTP_RELAY_PORT
+  domains = !+local_domains
+  require_files = SMTP_RELAY_FILE
+  transport = smtp_relay_smtp
+  route_list = * ${extract{1}{:}{$address_data}}::${extract{2}{:}{$address_data}}
+  no_more
+  no_verify
+
+dnslookup:
+  driver = dnslookup
+  domains = !+local_domains
+  transport = remote_smtp
+  no_more
+
+userforward:
+  driver = redirect
+  check_local_user
+  file = $home/.forward
+  require_files = ${local_part}:+${home}/.forward
+  domains = +local_domains
+  allow_filter
+  no_verify
+  no_expn
+  check_ancestor
+  file_transport = address_file
+  pipe_transport = address_pipe
+  reply_transport = address_reply
+
+procmail:
+  driver = accept
+  check_local_user
+  require_files = ${local_part}:+${home}/.procmailrc:/usr/bin/procmail
+  transport = procmail
+  no_verify
+
+autoreplay:
+  driver = accept
+  require_files = /etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/autoreply.${local_part}.msg
+  condition = ${if exists{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/autoreply.${local_part}.msg}{yes}{no}}
+  retry_use_local_part
+  transport = userautoreply
+  unseen
+
+aliases:
+  driver = redirect
+  headers_add = X-redirected: yes
+  data = ${extract{1}{:}{${lookup{$local_part@$domain}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/aliases}}}}
+  require_files = /etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/aliases
+  redirect_router = dnslookup
+  pipe_transport = address_pipe
+  unseen
+
+localuser_fwd_only:
+  driver = accept
+  transport = devnull
+  condition = ${if exists{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/fwd_only}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/fwd_only}{true}{false}}}}
+
+localuser_spam:
+  driver = accept
+  transport = local_spam_delivery
+  condition = ${if eq {${if match{$h_X-Spam-Status:}{\N^Yes\N}{yes}{no}}} {${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}{yes}{no_such_user}}}}
+
+localuser:
+  driver = accept
+  transport = local_delivery
+  condition = ${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}{true}{false}}
+
+catchall:
+  driver = redirect
+  headers_add = X-redirected: yes
+  require_files = /etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/aliases
+  data = ${extract{1}{:}{${lookup{*@$domain}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/aliases}}}}
+  file_transport = local_delivery
+  redirect_router = dnslookup
+  condition = ${lookup{$local_part@$domain}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains/}}/aliases}{false}{true}}
+
+terminate_alias:
+  driver = accept
+  transport = devnull
+  condition = ${lookup{$local_part@$domain}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/aliases}{true}{false}}
+
+######################################################################
+#                      TRANSPORTS CONFIGURATION                      #
+######################################################################
+begin transports
+
+smtp_relay_smtp:
+  driver = smtp
+  hosts_require_auth = $host_address
+  hosts_require_tls = $host_address
+
+remote_smtp:
+  driver = smtp
+  helo_data = ${lookup dnsdb{>: defer_never,ptr=$sending_ip_address}{${listextract{1}{$value}}}{$primary_hostname}}
+  dkim_domain = DKIM_DOMAIN
+  dkim_selector = mail
+  dkim_private_key = DKIM_PRIVATE_KEY
+  dkim_canon = relaxed
+  dkim_strict = 0
+  hosts_try_fastopen = !*.l.google.com
+  interface = ${if exists{OUTGOING_IP}{${readfile{OUTGOING_IP}}}}
+
+procmail:
+  driver = pipe
+  command = "/usr/bin/procmail -d $local_part"
+  return_path_add
+  delivery_date_add
+  envelope_to_add
+  user = $local_part
+  initgroups
+  return_output
+
+local_delivery:
+  driver = appendfile
+  maildir_format
+  maildir_use_size_file
+  user = ${extract{2}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}
+  group = mail
+  create_directory
+  directory_mode = 770
+  mode = 660
+  use_lockfile = no
+  delivery_date_add
+  envelope_to_add
+  return_path_add
+  directory = "${extract{5}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}/mail/$domain/$local_part"
+  quota = ${extract{6}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}M
+  quota_warn_threshold = 75%
+
+local_spam_delivery:
+  driver = appendfile
+  maildir_format
+  maildir_use_size_file
+  user = ${extract{2}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}
+  group = mail
+  create_directory
+  directory_mode = 770
+  mode = 660
+  use_lockfile = no
+  delivery_date_add
+  envelope_to_add
+  return_path_add
+  directory = "${extract{5}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}/mail/$domain/$local_part/.Spam"
+  quota = ${extract{6}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}M
+  quota_directory = "${extract{5}{:}{${lookup{$local_part}lsearch{/etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/passwd}}}}/mail/$domain/$local_part"
+  quota_warn_threshold = 75%
+
+address_pipe:
+  driver = pipe
+  return_output
+
+address_file:
+  driver = appendfile
+  delivery_date_add
+  envelope_to_add
+  return_path_add
+
+address_reply:
+  driver = autoreply
+
+userautoreply:
+  driver = autoreply
+  file = /etc/exim4/domains/${lookup{$domain}dsearch{/etc/exim4/domains}}/autoreply.${local_part}.msg
+  from = "${local_part}@${domain}"
+  headers = Content-Type: text/plain; charset=utf-8;\nContent-Transfer-Encoding: 8bit
+  subject = "${if def:h_Subject: {Autoreply: \"${rfc2047:$h_Subject:}\"} {Autoreply Message}}"
+  to = "${sender_address}"
+
+devnull:
+  driver = appendfile
+  file = /dev/null
+
+
+
+######################################################################
+#                      RETRY CONFIGURATION                           #
+######################################################################
+begin retry
+
+# Address or Domain    Error       Retries
+# -----------------    -----       -------
+*                      *           F,2h,15m; G,16h,1h,1.5; F,4d,6h
+
+
+
+######################################################################
+#                      REWRITE CONFIGURATION                         #
+######################################################################
+begin rewrite
+*@mail.laptertech.store   info@laptertech.store   bFfrs
+root@laptertech.store     info@laptertech.store   bFfrs
+
+
+
+
+######################################################################
+===DOVECOT_FULL===
+# 2.4.2 (0962ed2104): /etc/dovecot/dovecot.conf
+# Pigeonhole version 2.4.2 (767418c3)
+# OS: Linux 7.0.0-29-generic x86_64 Ubuntu 26.04 LTS 
+# Hostname: mail.laptertech.store
+# 9 default setting changes since version 2.4.0
+dovecot_config_version = 2.4.0
+auth_mechanisms = plain login
+auth_verbose = yes
+base_dir = /run/dovecot/
+default_login_user = dovecot
+dovecot_storage_version = 2.4.0
+fts_autoindex = yes
+fts_autoindex_max_recent_msgs = 999
+fts_search_add_missing = yes
+listen = * ::
+log_path = /var/log/dovecot.log
+login_greeting = Mail Delivery Agent
+mail_access_groups = mail
+mail_driver = maildir
+mail_home = ~
+mail_path = ~
+mail_plugins = quota
+mail_privileged_group = mail
+protocols = imap pop3
+ssl_cipher_list = ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256
+passdb passwd-file {
+  auth_username_format = %{ user | username }
+  default_password_scheme = BLF-CRYPT
+  driver = passwd-file
+  passwd_file_path = /etc/exim4/domains/%{ user | domain }/passwd
+}
+userdb passwd-file {
+  auth_username_format = %{ user | username }
+  passwd_file_path = /etc/exim4/domains/%{ user | domain }/passwd
+  driver = passwd-file
+}
+maildir {
+  copy_with_hardlinks = yes
+}
+service imap-login {
+  inet_listener imap {
+  }
+  inet_listener imaps {
+  }
+}
+service pop3-login {
+  inet_listener pop3 {
+  }
+  inet_listener pop3s {
+  }
+}
+service imap {
+}
+service pop3 {
+}
+service auth {
+  extra_groups = mail
+  user = dovecot
+  unix_listener auth-client {
+    group = mail
+    mode = 0660
+    user = dovecot
+  }
+}
+service stats {
+  unix_listener stats-writer {
+    group = mail
+    mode = 0660
+    user = dovecot
+  }
+}
+ssl_server {
+  cert_file = /usr/local/hestia/ssl/certificate.crt
+  dh_file = /etc/ssl/dhparam.pem
+  key_file = /usr/local/hestia/ssl/certificate.key
+  prefer_ciphers = client
+}
+namespace inbox {
+  inbox = yes
+  list = yes
+  separator = /
+  type = private
+  mailbox Archive {
+    auto = subscribe
+    special_use = "\\Archive"
+  }
+  mailbox Drafts {
+    auto = subscribe
+    special_use = "\\Drafts"
+  }
+  mailbox Trash {
+    auto = subscribe
+    special_use = "\\Trash"
+  }
+  mailbox "Deleted Messages" {
+    auto = no
+    special_use = "\\Trash"
+  }
+  mailbox Spam {
+    auto = subscribe
+    special_use = "\\Junk"
+  }
+  mailbox Junk {
+    auto = no
+    special_use = "\\Junk"
+  }
+  mailbox Sent {
+    auto = subscribe
+    special_use = "\\Sent"
+  }
+  mailbox "Sent Mail" {
+    auto = no
+    special_use = "\\Sent"
+  }
+  mailbox "Sent Messages" {
+    auto = no
+    special_use = "\\Sent"
+  }
+}
+protocol imap {
+  mail_plugins = mail_compress quota imap_quota
+}
+protocol lmtp {
+  auth_username_format = %{user | username | lower}
+}
+protocol pop3 {
+  mail_plugins = mail_compress quota
+}
+quota "User quota" {
+}
+local_name mail.laptertech.store {
+  ssl_server {
+    cert_file = /home/lapter/conf/mail/laptertech.store/ssl/laptertech.store.pem
+    key_file = /home/lapter/conf/mail/laptertech.store/ssl/laptertech.store.key
+  }
+}
+===DOVECOT_CONF_FILES===
+total 152
+drwxr-xr-x 3 root root  4096 Aug 18 08:29 .
+drwxr-xr-x 4 root root  4096 Aug 16 12:28 ..
+-rw-r--r-- 1 root root  5646 Aug 16 12:38 10-auth.conf
+-rw-r--r-- 1 root root  3637 Aug 16 12:38 10-logging.conf
+-rw-r--r-- 1 root root 18145 Aug 16 12:38 10-mail.conf
+-rw-r--r-- 1 root root  4588 Aug 16 12:38 10-master.conf
+-rw-r--r-- 1 root root  3017 Aug 16 12:38 10-metrics.conf
+-rw-r--r-- 1 root root  3617 Aug 16 12:38 10-ssl.conf
+-rw-r--r-- 1 root root  2149 Aug 16 12:38 15-lda.conf
+-rw-r--r-- 1 root root  4472 Aug 16 12:38 15-mailboxes.conf
+-rw-r--r-- 1 root root  5211 Aug 16 12:38 20-imap.conf
+-rw-r--r-- 1 root root  1770 May 28 19:37 20-lmtp.conf
+-rw-r--r-- 1 root root  4983 Aug 16 12:38 20-pop3.conf
+-rw-r--r-- 1 root root   787 May 28 19:37 30-dict-server.conf
+-rw-r--r-- 1 root root   828 May 28 19:37 90-acl.conf
+-rw-r--r-- 1 root root   719 May 28 19:37 90-fts.conf
+-rw-r--r-- 1 root root  2567 Aug 16 12:38 90-quota.conf
+-rw-r--r-- 1 root root  1789 May 28 19:37 90-sieve-extprograms.conf
+-rw-r--r-- 1 root root  4164 May 28 19:37 90-sieve.conf
+-rw-r--r-- 1 root root   508 May 28 19:37 auth-deny.conf.ext
+-rw-r--r-- 1 root root   457 May 28 19:37 auth-master.conf.ext
+-rw-r--r-- 1 root root   507 May 28 19:37 auth-oauth2.conf.ext
+-rw-r--r-- 1 root root  1369 Aug 16 12:38 auth-passwdfile.conf.ext
+-rw-r--r-- 1 root root  6093 May 28 19:37 auth-sql.conf.ext
+-rw-r--r-- 1 root root   820 May 28 19:37 auth-static.conf.ext
+-rw-r--r-- 1 root root  2295 May 28 19:37 auth-system.conf.ext
+drwxr-xr-x 2 root root  4096 Aug 18 16:17 domains
+########################################
+# Dovecot conf file modified by Hestia #
+########################################
+
+mail_privileged_group = mail
+mail_access_groups = mail
+
+mail_driver = maildir
+mail_home = ~
+mail_path = ~
+
+pop3_uidl_format = %{uid | hex(8)}%{uidvalidity | hex(8)}
+
+mailbox_list_index = yes
+mailbox_idle_check_interval = 30 secs
+
+maildir_copy_with_hardlinks = yes
+
+mail_plugins = quota
+
+##############################################
+# Original distribution files are located in #
+# /usr/share/dovecot/                        #
+#                                            #
+# Below is a copy of the original file.      #
+# All lines starting with #-# were already   #
+# uncommented in the original version        #
+##############################################
+
+##
+## Mailbox locations and namespaces
+##
+
+# Location for users' mailboxes. The default is empty, which means that Dovecot
+# tries to find the mailboxes automatically. This won't work if the user
+# doesn't yet have any mail, so you should explicitly tell Dovecot the full
+# location.
+#
+# If you're using mbox, giving a path to the INBOX file (eg. /var/mail/%u)
+# isn't enough. You'll also need to tell Dovecot where the other mailboxes are
+# kept. This is called the "root mail directory", and it must be the first
+# path given in the mail_location setting.
+#
+# There are a few special variables you can use, eg.:
+#
+#   %{user} - username
+#   %{user|username} - user part in user@domain, same as %u if there's no domain
+#   %{user|domain} - domain part in user@domain, empty if there's no domain
+#   %{home} - home directory
+#
+# See https://doc.dovecot.org/latest/core/settings/variables.html for full list
+# of variables.
+#
+# Example:
+#  mail_driver = maildir
+#  mail_path = ~/Maildir
+#  mail_inbox_path = ~/Maildir/.INBOX
+#
+
+# Debian defaults
+# Note that upstream considers mbox deprecated and strongly recommends
+# against its use in production environments. See further information
+# at
+# https://doc.dovecot.org/2.4.0/core/config/mailbox/formats/mbox.html
+#-#mail_driver = mbox
+#-#mail_home = /home/%{user|username}
+#-#mail_path = %{home}/mail
+#-#mail_inbox_path = /var/mail/%{user}
+
+# If you need to set multiple mailbox locations or want to change default
+# namespace settings, you can do it by defining namespace sections.
+#
+# You can have private, shared and public namespaces. Private namespaces
+# are for user's personal mails. Shared namespaces are for accessing other
+# users' mailboxes that have been shared. Public namespaces are for shared
+# mailboxes that are managed by sysadmin. If you create any shared or public
+# namespaces you'll typically want to enable ACL plugin also, otherwise all
+# users can access all the shared mailboxes, assuming they have permissions
+# on filesystem level to do so.
+#-#namespace inbox {
+  # Namespace type: private, shared or public
+  #type = private
+
+  # Hierarchy separator to use. You should use the same separator for all
+  # namespaces or some clients get confused. '/' is usually a good one.
+  # The default however depends on the underlying mail storage format.
+  #separator = 
+
+  # Prefix required to access this namespace. This needs to be different for
+  # all namespaces. For example "Public/".
+  #prefix = 
+
+  # Physical location of the mailbox. This is in same format as
+  # mail location, which is also the default for it.
+  # mail_driver = 
+  # mail_path = 
+  #
+  # There can be only one INBOX, and this setting defines which namespace
+  # has it.
+  #-#inbox = yes
+
+  # If namespace is hidden, it's not advertised to clients via NAMESPACE
+  # extension. You'll most likely also want to set list=no. This is mostly
+  # useful when converting from another server with different namespaces which
+  # you want to deprecate but still keep working. For example you can create
+  # hidden namespaces with prefixes "~/mail/", "~%u/mail/" and "mail/".
+  #hidden = no
+
+  # Show the mailboxes under this namespace with LIST command. This makes the
+  # namespace visible for clients that don't support NAMESPACE extension.
+  # "children" value lists child mailboxes, but hides the namespace prefix.
+  #list = yes
+
+  # Namespace handles its own subscriptions. If set to "no", the parent
+  # namespace handles them (empty prefix should always have this as "yes")
+  #subscriptions = yes
+
+  # See 15-mailboxes.conf for definitions of special mailboxes.
+#-#}
+
+# Example shared namespace configuration
+#namespace shared {
+  #type = shared
+  #separator = /
+
+  # Mailboxes are visible under "shared/user@domain/"
+  # $user, $domain and $username are expanded to the destination user.
+  #prefix = shared/$user/
+
+  # Mail location for other users' mailboxes. Note that %{variables} and ~/
+  # expands to the logged in user's data. %{owner_user} and %{owner_home}
+  # destination user's data.
+  #mail_driver = maildir
+  #mail_path = %{owner_home}/Maildir
+  #mail_index_path = ~/Maildir/shared/%{owner_user}
+
+  # Use the default namespace for saving subscriptions.
+  #subscriptions = no
+
+  # List the shared/ namespace only if there are visible shared mailboxes.
+  #list = children
+#}
+# Should shared INBOX be visible as "shared/user" or "shared/user/INBOX"?
+#mail_shared_explicit_inbox = no
+
+# System user and group used to access mails. If you use multiple, userdb
+# can override these by returning uid or gid fields. You can use either numbers
+# or names. <https://doc.dovecot.org/latest/core/config/system_users.html#uids>
+#mail_uid =
+#mail_gid =
+
+#  Group to enable temporarily for privileged operations. Currently this is
+# used only with INBOX when either its initial creation or dotlocking fails.
+# Typically this is set to "mail" to give access to /var/mail.
+#-#mail_privileged_group = mail
+
+# Grant access to these supplementary groups for mail processes. Typically
+# these are used to set up access to shared mailboxes. Note that it may be
+# dangerous to set these if users can create symlinks (e.g. if "mail" group is
+# set here, ln -s /var/mail ~/mail/var could allow a user to delete others'
+# mailboxes, or ln -s /secret/shared/box ~/mail/mybox would allow reading it).
+#mail_access_groups =
+
+# Allow full filesystem access to clients. There's no access checks other than
+# what the operating system does for the active UID/GID. It works with both
+# maildir and mboxes, allowing you to prefix mailboxes names with eg. /path/
+# or ~user/.
+#mail_full_filesystem_access = no
+
+# Dictionary for key=value mailbox attributes. This is used for example by
+# URLAUTH and METADATA extensions.
+#mail_attribute {
+#  dict file {
+#    path = %{home}/Maildir/dovecot-attributes
+#  }
+#}
+
+# A comment or note that is associated with the server. This value is
+# accessible for authenticated users through the IMAP METADATA server
+# entry "/shared/comment". 
+#mail_server_comment = ""
+
+# Indicates a method for contacting the server administrator. According to
+# RFC 5464, this value MUST be a URI (e.g., a mailto: or tel: URL), but that
+# is currently not enforced. Use for example mailto:admin@example.com. This
+# value is accessible for authenticated users through the IMAP METADATA server
+# entry "/shared/admin".
+#mail_server_admin = 
+
+##
+## Mail processes
+##
+
+# Don't use mmap() at all. This is required if you store indexes to shared
+# filesystems (NFS or clustered filesystem).
+#mmap_disable = no
+
+# Rely on O_EXCL to work when creating dotlock files. NFS supports O_EXCL
+# since version 3, so this should be safe to use nowadays by default.
+#dotlock_use_excl = yes
+
+# When to use fsync() or fdatasync() calls:
+#   optimized (default): Whenever necessary to avoid losing important data
+#   always: Useful with e.g. NFS when write()s are delayed
+#   never: Never use it (best performance, but crashes can lose data)
+#mail_fsync = optimized
+
+# Locking method for index files. Alternatives are fcntl, flock and dotlock.
+# Dotlocking uses some tricks which may create more disk I/O than other locking
+# methods. NFS users: flock doesn't work, remember to change mmap_disable.
+#lock_method = fcntl
+
+# Directory where mails can be temporarily stored. Usually it's used only for
+# mails larger than >= 128 kB. It's used by various parts of Dovecot, for
+# example LDA/LMTP while delivering large mails or zlib plugin for keeping
+# uncompressed mails.
+#mail_temp_dir = /tmp
+
+# Valid UID range for users, defaults to 500 and above. This is mostly
+# to make sure that users can't log in as daemons or other system users.
+# Note that denying root logins is hardcoded to dovecot binary and can't
+# be done even if first_valid_uid is set to 0.
+#first_valid_uid = 500
+#last_valid_uid = 0
+
+# Valid GID range for users, defaults to non-root/wheel. Users having
+# non-valid GID as primary group ID aren't allowed to log in. If user
+# belongs to supplementary groups with non-valid GIDs, those groups are
+# not set.
+#first_valid_gid = 1
+#last_valid_gid = 0
+
+# Maximum allowed length for mail keyword name. It's only forced when trying
+# to create new keywords.
+#mail_max_keyword_length = 50
+
+# ':' separated list of directories under which chrooting is allowed for mail
+# processes (ie. /var/mail will allow chrooting to /var/mail/foo/bar too).
+# This setting doesn't affect login_chroot, mail_chroot or auth chroot
+# settings. If this setting is empty, "/./" in home dirs are ignored.
+# WARNING: Never add directories here which local users can modify, that
+# may lead to root exploit. Usually this should be done only if you don't
+# allow shell access for users. <doc/wiki/Chrooting.txt>
+#valid_chroot_dirs = 
+
+# Default chroot directory for mail processes. This can be overridden for
+# specific users in user database by giving /./ in user's home directory
+# (eg. /home/./user chroots into /home). Note that usually there is no real
+# need to do chrooting, Dovecot doesn't allow users to access files outside
+# their mail directory anyway. If your home directories are prefixed with
+# the chroot directory, append "/." to mail_chroot. <doc/wiki/Chrooting.txt>
+#mail_chroot = 
+
+# UNIX socket path to master authentication server to find users.
+# This is used by imap (for shared users) and lda.
+#auth_socket_path = /var/run/dovecot/auth-userdb
+
+# Directory where to look up mail plugins.
+#mail_plugin_dir = /usr/lib/dovecot
+
+# Space separated list of plugins to load for all services. Plugins specific to
+# IMAP, LDA, etc. are added to this list in their own .conf files.
+#mail_plugins =
+#
+# To add plugins, use
+#mail_plugins {
+#  plugin = yes
+#}
+
+##
+## Mailbox handling optimizations
+##
+
+# Mailbox list indexes can be used to optimize IMAP STATUS commands. They are
+# also required for IMAP NOTIFY extension to be enabled.
+#mailbox_list_index = yes
+
+# Trust mailbox list index to be up-to-date. This reduces disk I/O at the cost
+# of potentially returning out-of-date results after e.g. server crashes.
+# The results will be automatically fixed once the folders are opened.
+#mailbox_list_index_very_dirty_syncs = yes
+
+# Should INBOX be kept up-to-date in the mailbox list index? By default it's
+# not, because most of the mailbox accesses will open INBOX anyway.
+#mailbox_list_index_include_inbox = no
+
+# The minimum number of mails in a mailbox before updates are done to cache
+# file. This allows optimizing Dovecot's behavior to do less disk writes at
+# the cost of more disk reads.
+#mail_cache_min_mail_count = 0
+
+# When IDLE command is running, mailbox is checked once in a while to see if
+# there are any new mails or other changes. This setting defines the minimum
+# time to wait between those checks. Dovecot can also use inotify and
+# kqueue to find out immediately when changes occur.
+#mailbox_idle_check_interval = 30 secs
+
+# Save mails with CR+LF instead of plain LF. This makes sending those mails
+# take less CPU, especially with sendfile() syscall with Linux and FreeBSD.
+# But it also creates a bit more disk I/O which may just make it slower.
+# Also note that if other software reads the mboxes/maildirs, they may handle
+# the extra CRs wrong and cause problems.
+#mail_save_crlf = no
+
+# Max number of mails to keep open and prefetch to memory. This only works with
+# some mailbox formats and/or operating systems.
+#mail_prefetch_count = 0
+
+# How often to scan for stale temporary files and delete them (0 = never).
+# These should exist only after Dovecot dies in the middle of saving mails.
+#mail_temp_scan_interval = 1w
+
+# How many slow mail accesses sorting can perform before it returns failure.
+# With IMAP the reply is: NO [LIMIT] Requested sort would have taken too long.
+# The untagged SORT reply is still returned, but it's likely not correct.
+#mail_sort_max_read_count = 0
+
+#-#protocol !indexer-worker {
+  # If folder vsize calculation requires opening more than this many mails from
+  # disk (i.e. mail sizes aren't in cache already), return failure and finish
+  # the calculation via indexer process. Disabled by default. This setting must
+  # be 0 for indexer-worker processes.
+  #mail_vsize_bg_after_count = 0
+#-#}
+
+##
+## Maildir-specific settings
+##
+
+# By default LIST command returns all entries in maildir beginning with a dot.
+# Enabling this option makes Dovecot return only entries which are directories.
+# This is done by stat()ing each entry, so it causes more disk I/O.
+# (For systems setting struct dirent->d_type, this check is free and it's
+# done always regardless of this setting)
+#maildir_stat_dirs = no
+
+# When copying a message, do it with hard links whenever possible. This makes
+# the performance much better, and it's unlikely to have any side effects.
+#maildir_copy_with_hardlinks = yes
+
+# Assume Dovecot is the only MUA accessing Maildir: Scan cur/ directory only
+# when its mtime changes unexpectedly or when we can't find the mail otherwise.
+#maildir_very_dirty_syncs = no
+
+# If enabled, Dovecot doesn't use the S=<size> in the Maildir filenames for
+# getting the mail's physical size, except when recalculating Maildir++ quota.
+# This can be useful in systems where a lot of the Maildir filenames have a
+# broken size. The performance hit for enabling this is very small.
+#maildir_broken_filename_sizes = no
+
+# Always move mails from new/ directory to cur/, even when the \Recent flags
+# aren't being reset.
+#maildir_empty_new = no
+
+##
+## mbox-specific settings
+##
+
+# Which locking methods to use for locking mbox. There are four available:
+#  dotlock: Create <mailbox>.lock file. This is the oldest and most NFS-safe
+#           solution. If you want to use /var/mail/ like directory, the users
+#           will need write access to that directory.
+#  dotlock_try: Same as dotlock, but if it fails because of permissions or
+#               because there isn't enough disk space, just skip it.
+#  fcntl  : Use this if possible. Works with NFS too if lockd is used.
+#  flock  : May not exist in all systems. Doesn't work with NFS.
+#  lockf  : May not exist in all systems. Doesn't work with NFS.
+#
+# You can use multiple locking methods; if you do the order they're declared
+# in is important to avoid deadlocks if other MTAs/MUAs are using multiple
+# locking methods as well. Some operating systems don't allow using some of
+# them simultaneously.
+#mbox_read_locks = fcntl
+#mbox_write_locks = dotlock fcntl
+
+# Maximum time to wait for lock (all of them) before aborting.
+#mbox_lock_timeout = 5 mins
+
+# If dotlock exists but the mailbox isn't modified in any way, override the
+# lock file after this much time.
+#mbox_dotlock_change_timeout = 2 mins
+
+# When mbox changes unexpectedly we have to fully read it to find out what
+# changed. If the mbox is large this can take a long time. Since the change
+# is usually just a newly appended mail, it'd be faster to simply read the
+# new mails. If this setting is enabled, Dovecot does this but still safely
+# fallbacks to re-reading the whole mbox file whenever something in mbox isn't
+# how it's expected to be. The only real downside to this setting is that if
+# some other MUA changes message flags, Dovecot doesn't notice it immediately.
+# Note that a full sync is done with SELECT, EXAMINE, EXPUNGE and CHECK 
+# commands.
+#mbox_dirty_syncs = yes
+
+# Like mbox_dirty_syncs, but don't do full syncs even with SELECT, EXAMINE,
+# EXPUNGE or CHECK commands. If this is set, mbox_dirty_syncs is ignored.
+#mbox_very_dirty_syncs = no
+
+# Delay writing mbox headers until doing a full write sync (EXPUNGE and CHECK
+# commands and when closing the mailbox). This is especially useful for POP3
+# where clients often delete all mails. The downside is that our changes
+# aren't immediately visible to other MUAs.
+#mbox_lazy_writes = yes
+
+# If mbox size is smaller than this (e.g. 100k), don't write index files.
+# If an index file already exists it's still read, just not updated.
+#mbox_min_index_size = 0
+
+# Mail header selection algorithm to use for MD5 POP3 UIDLs when
+# pop3_uidl_format=%m. For backwards compatibility we use apop3d inspired
+# algorithm, but it fails if the first Received: header isn't unique in all
+# mails. An alternative algorithm is "all" that selects all headers.
+#mbox_md5 = apop3d
+
+##
+## mdbox-specific settings
+##
+
+# Maximum dbox file size until it's rotated.
+#mdbox_rotate_size = 10M
+
+# Maximum dbox file age until it's rotated. Typically in days. Day begins
+# from midnight, so 1d = today, 2d = yesterday, etc. 0 = check disabled.
+#mdbox_rotate_interval = 0
+
+# When creating new mdbox files, immediately preallocate their size to
+# mdbox_rotate_size. This setting currently works only in Linux with some
+# filesystems (ext4, xfs).
+#mdbox_preallocate_space = no
+
+# Settings to control adding $HasAttachment or $HasNoAttachment keywords.
+# By default, all MIME parts with Content-Disposition=attachment, or inlines
+# with filename parameter are consired attachments.
+#   add-flags - Add the keywords when saving new mails or when fetching can
+#      do it efficiently.
+#   content-type=type or !type - Include/exclude content type. Excluding will
+#     never consider the matched MIME part as attachment. Including will only
+#     negate an exclusion (e.g. content-type=!foo/* content-type=foo/bar).
+#   exclude-inlined - Exclude any Content-Disposition=inline MIME part.
+#mail_attachment_detection_options =
+===ROUNDCUBE_FULL_CONFIG===
+<?php
+/* Local configuration for Roundcube Webmail */
+
+//rewrite below this line
+$config["db_dsnw"] = "mysql://roundcube:PSNmmtM3ad5qdTc7@localhost/roundcube";
+
+// Log sent messages to <log_dir>/sendmail or to syslog
+$config["smtp_log"] = false;
+
+// Log IMAP conversation to <log_dir>/imap or to syslog
+$config["imap_debug"] = true;
+
+// Log SMTP conversation to <log_dir>/smtp.log or to syslog
+$config["smtp_debug"] = true;
+
+// ----------------------------------
+// IMAP
+// ----------------------------------
+// The IMAP host chosen to perform the log-in.
+// Leave blank to show a textbox at login, give a list of hosts
+// to display a pulldown menu or set one host as string.
+// Enter hostname with prefix ssl:// to use Implicit TLS, or use
+// prefix tls:// to use STARTTLS.
+// Supported replacement variables:
+// %n - hostname ($_SERVER['SERVER_NAME'])
+// %t - hostname without the first part
+// %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
+// %s - domain name after the '@' from e-mail address provided at login screen
+// For example %n = mail.domain.tld, %t = domain.tld
+// WARNING: After hostname change update of mail_host column in users table is
+//          required to match old user data records with the new host.
+$config["imap_host"] = "localhost:143";
+
+// IMAP socket context options
+// See http://php.net/manual/en/context.ssl.php
+// The example below enables server certificate validation
+//$config['imap_conn_options'] = array(
+//  'ssl'         => array(
+//     'verify_peer'  => true,
+//     'verify_depth' => 3,
+//     'cafile'       => '/etc/openssl/certs/ca.crt',
+//   ),
+// );
+// Note: These can be also specified as an array of options indexed by hostname
+$config["imap_conn_options"] = [
+	"ssl" => [
+		"verify_peer" => false,
+		"verify_peer_name" => false,
+		"verify_depth" => 3,
+		"cafile" => "/etc/ssl/certs/ca-certificates.crt",
+	],
+];
+
+// SMTP socket context options
+// See http://php.net/manual/en/context.ssl.php
+// The example below enables server certificate validation, and
+// requires 'smtp_timeout' to be non zero.
+// $config['smtp_conn_options'] = array(
+//   'ssl'         => array(
+//     'verify_peer'  => true,
+//     'verify_depth' => 3,
+//     'cafile'       => '/etc/openssl/certs/ca.crt',
+//   ),
+// );
+// Note: These can be also specified as an array of options indexed by hostname
+$config["smtp_conn_options"] = [
+	"ssl" => [
+		"verify_peer" => false,
+		"verify_peer_name" => false,
+		"verify_depth" => 3,
+		"cafile" => "/etc/ssl/certs/ca-certificates.crt",
+	],
+];
+
+// provide an URL where a user can get support for this Roundcube installation
+// PLEASE DO NOT LINK TO THE ROUNDCUBE.NET WEBSITE HERE!
+$config["support_url"] = "";
+
+// use this folder to store log files
+// must be writeable for the user who runs PHP process (Apache user if mod_php is being used)
+// This is used by the 'file' log driver.
+$config["log_dir"] = "/var/log/roundcube/";
+
+// This key is used for encrypting purposes, like storing of imap password
+// in the session. For historical reasons it's called DES_key, but it's used
+// with any configured cipher_method (see below).
+// For the default cipher_method a required key length is 24 characters.
+$config["des_key"] = "x0gHd62Vxsed7FNiYo7E1YjR";
+
+// Maximum number of recipients per message (including To, Cc, Bcc).
+// Default: 0 (no limit)
+$config["max_recipients"] = 100;
+
+// List of active plugins (in plugins/ directory)
+$config["plugins"] = ["password", "newmail_notifier", "zipdownload", "archive"];
+
+$config["default_user"] = "%u";
+
+$config["default_pass"] = "%p";
+
+$config["smtp_host"] = "tls://mail.laptertech.store:587";
+
+// Log session authentication errors to <log_dir>/session or to syslog
+$config["log_session"] = true;
+===MAIL_DIR_STRUCTURE===
+/home/lapter/mail/
+/home/lapter/mail/laptertech.store
+/home/lapter/mail/laptertech.store/info
+/home/lapter/mail/laptertech.store/info/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Drafts
+/home/lapter/mail/laptertech.store/info/.Drafts/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Drafts/cur
+/home/lapter/mail/laptertech.store/info/.Drafts/tmp
+/home/lapter/mail/laptertech.store/info/.Drafts/dovecot.index.cache
+/home/lapter/mail/laptertech.store/info/.Drafts/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Drafts/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Drafts/new
+/home/lapter/mail/laptertech.store/info/cur
+/home/lapter/mail/laptertech.store/info/tmp
+/home/lapter/mail/laptertech.store/info/dovecot-uidvalidity
+/home/lapter/mail/laptertech.store/info/subscriptions
+/home/lapter/mail/laptertech.store/info/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Sent
+/home/lapter/mail/laptertech.store/info/.Sent/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Sent/cur
+/home/lapter/mail/laptertech.store/info/.Sent/cur/1787983419.M536134P1997527.mail.laptertech.store,S=426,W=438:2,S
+/home/lapter/mail/laptertech.store/info/.Sent/tmp
+/home/lapter/mail/laptertech.store/info/.Sent/dovecot.index.cache
+/home/lapter/mail/laptertech.store/info/.Sent/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Sent/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Sent/new
+/home/lapter/mail/laptertech.store/info/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Spam
+/home/lapter/mail/laptertech.store/info/.Spam/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Spam/cur
+/home/lapter/mail/laptertech.store/info/.Spam/tmp
+/home/lapter/mail/laptertech.store/info/.Spam/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Spam/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Spam/new
+/home/lapter/mail/laptertech.store/info/dovecot-uidvalidity.6a846de5
+/home/lapter/mail/laptertech.store/info/dovecot.list.index
+/home/lapter/mail/laptertech.store/info/.Trash
+/home/lapter/mail/laptertech.store/info/.Trash/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Trash/cur
+/home/lapter/mail/laptertech.store/info/.Trash/tmp
+/home/lapter/mail/laptertech.store/info/.Trash/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Trash/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Trash/new
+/home/lapter/mail/laptertech.store/info/.Archive
+/home/lapter/mail/laptertech.store/info/.Archive/maildirfolder
+/home/lapter/mail/laptertech.store/info/.Archive/cur
+/home/lapter/mail/laptertech.store/info/.Archive/tmp
+/home/lapter/mail/laptertech.store/info/.Archive/dovecot-uidlist
+/home/lapter/mail/laptertech.store/info/.Archive/dovecot.index.log
+/home/lapter/mail/laptertech.store/info/.Archive/new
+/home/lapter/mail/laptertech.store/info/dovecot.list.index.log
+/home/lapter/mail/laptertech.store/info/dovecot.mailbox.log
+/home/lapter/mail/laptertech.store/info/new
+===HESTIA_EXIM_CONF===
+===EXIM_VERSION===
+Exim version 4.99.1 #2 built 17-Jul-2026 14:20:36
+Copyright (c) University of Cambridge, 1995 - 2018
+(c) The Exim Maintainers and contributors in ACKNOWLEDGMENTS file, 2007 - 2025
+===DOVECOT_VERSION===
+2.4.2 (0962ed2104)
+===DONE_INSPECT===

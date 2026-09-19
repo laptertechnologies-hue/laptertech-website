@@ -3,8 +3,8 @@ const https = require('https');
 function callHestia(cmd, args = []) {
   return new Promise((resolve, reject) => {
     const payload = {
-      access_key: process.env.HESTIA_ACCESS_KEY_ID || "zaShGnEOGtUkf1nR7ouT",
-      secret_key: process.env.HESTIA_SECRET_ACCESS_KEY || "sDvEzLSzQjEbuTXAIXtbYXSdaK-_vOQvJAh46bfg",
+      access_key: process.env.HESTIA_ACCESS_KEY_ID,
+      secret_key: process.env.HESTIA_SECRET_ACCESS_KEY,
       cmd: cmd
     };
     
@@ -15,7 +15,7 @@ function callHestia(cmd, args = []) {
     const body = JSON.stringify(payload);
     
     const options = {
-      hostname: '162.35.98.198',
+      hostname: process.env.HESTIA_HOST,
       port: 8083,
       path: '/api/',
       method: 'POST',
@@ -65,8 +65,8 @@ module.exports = async (req, res) => {
   try {
     const { adminPassword, action, targetUser, newPassword } = req.body;
 
-    // Security Gate
-    if (adminPassword !== 'lapteradmin123') {
+    // Security Gate — password stored in Vercel environment variable only
+    if (!process.env.ADMIN_PASSWORD || adminPassword !== process.env.ADMIN_PASSWORD) {
       return res.status(401).json({ error: 'Unauthorized: Invalid Administrator Password' });
     }
 

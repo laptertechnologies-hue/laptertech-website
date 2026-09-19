@@ -1,0 +1,104 @@
+===1=== SERVICES ===
+active
+active
+===2=== EXIM CONFIG ===
+dc_eximconfig_configtype='smarthost'
+dc_other_hostnames='laptertech.store'
+dc_local_interfaces=''
+dc_readhost='laptertech.store'
+dc_relay_domains=''
+dc_minimaldns='false'
+dc_relay_nets=''
+dc_smarthost='relay.mailbaby.net::587'
+CFILEMODE='644'
+dc_use_split_config='false'
+dc_hide_mailname='true'
+dc_mailname_in_oh='true'
+dc_localdelivery='mail_spool'
+---MAILNAME---
+laptertech.store
+===3=== PASSWD.CLIENT ===
+relay.mailbaby.net:mb90171:8ggAybxu3YmQRvMXNH9r
+*.mailbaby.net:mb90171:8ggAybxu3YmQRvMXNH9r
+===4=== SMTP_RELAY.CONF ===
+host:relay.mailbaby.net
+port:587
+user:mb90171
+pass:8ggAybxu3YmQRvMXNH9r
+===5=== HESTIA MAIL ACCOUNTS ===
+ACCOUNT  ALIAS  FWD  DISK  DATE
+-------  -----  ---  ----  ----
+info     no     no   1     2026-08-18
+===6=== DOVECOT ===
+---PORTS---
+LISTEN 0      100          0.0.0.0:143        0.0.0.0:*    users:(("dovecot",pid=2044859,fd=32))                                                                                      
+LISTEN 0      100          0.0.0.0:110        0.0.0.0:*    users:(("dovecot",pid=2044859,fd=36))                                                                                      
+LISTEN 0      100          0.0.0.0:995        0.0.0.0:*    users:(("dovecot",pid=2044859,fd=38))                                                                                      
+LISTEN 0      100          0.0.0.0:993        0.0.0.0:*    users:(("dovecot",pid=2044859,fd=34))                                                                                      
+LISTEN 0      100             [::]:143           [::]:*    users:(("dovecot",pid=2044859,fd=33))                                                                                      
+LISTEN 0      100             [::]:110           [::]:*    users:(("dovecot",pid=2044859,fd=37))                                                                                      
+LISTEN 0      100             [::]:995           [::]:*    users:(("dovecot",pid=2044859,fd=39))                                                                                      
+LISTEN 0      100             [::]:993           [::]:*    users:(("dovecot",pid=2044859,fd=35))                                                                                      
+===7=== MAIL STORAGE ===
+(no Maildir)
+---NEW MSGS---
+0
+---CUR MSGS---
+0
+---SENT CHECK---
+(no .Sent folder)
+0
+---TOTAL MAIL FILES---
+27
+===8=== DNS ===
+10 mail.laptertech.store.
+---SPF---
+"google-site-verification=iMdBWlA77FXUAg4BtBxGRAdChRTqRm9DhxvjflQUzM4"
+"v=spf1 a mx ip4:162.35.98.198 ~all"
+===9=== MAIL QUEUE ===
+1168
+===10=== MAIL LOG ===
+2026-08-29 08:09:03 1x0E7Z-00000008Xhj-2py4 <= info@laptertech.store U=root P=local S=741
+2026-08-29 08:09:07 1x0E7Z-00000008Xhj-2py4 ** root@mail.laptertech.store R=send_via_smtp_relay T=smtp_relay_smtp H=relay.mailbaby.net [209.159.152.170] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=yes : SMTP error from remote mail server after end of data: 550 200 This message was classified as rSPAM and may not be delivered https://mail.outboundspamprotection.com/mailinfo?id=1a04c90a854000bf8a&user=mb90171
+2026-08-29 08:09:07 1x0E7f-00000008XiY-24Gy <= <> R=1x0E7Z-00000008Xhj-2py4 U=Debian-exim P=local S=2519
+2026-08-29 08:09:07 1x0E7f-00000008XiY-24Gy == info@laptertech.store R=localuser T=local_delivery defer (-1): Tainted '/home/lapter/mail/laptertech.store/info/mail/laptertech.store/info' (file or directory name for local_delivery transport) not permitted
+2026-08-29 08:09:08 1x0E7Z-00000008Xhj-2py4 Completed
+2026-08-29 08:10:02 1x0E8X-00000008XlK-3ULP <= info@laptertech.store U=root P=local S=741
+2026-08-29 08:10:02 1x0E8X-00000008XlL-3UGL <= info@laptertech.store U=root P=local S=741
+2026-08-29 08:10:04 1x0E8X-00000008XlK-3ULP ** root@mail.laptertech.store R=send_via_smtp_relay T=smtp_relay_smtp H=relay.mailbaby.net [67.211.215.74] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=yes : SMTP error from remote mail server after end of data: 550 200 This message was classified as rSPAM and may not be delivered https://mail.outboundspamprotection.com/mailinfo?id=1a04c918e4a000025b&user=mb90171
+2026-08-29 08:10:04 1x0E8a-00000008XpZ-39cK <= <> R=1x0E8X-00000008XlK-3ULP U=Debian-exim P=local S=2517
+2026-08-29 08:10:04 1x0E8X-00000008XlK-3ULP Completed
+2026-08-29 08:10:04 1x0E8a-00000008XpZ-39cK == info@laptertech.store R=localuser T=local_delivery defer (-1): Tainted '/home/lapter/mail/laptertech.store/info/mail/laptertech.store/info' (file or directory name for local_delivery transport) not permitted
+2026-08-29 08:10:23 1x0E8X-00000008XlL-3UGL ** root@mail.laptertech.store R=send_via_smtp_relay T=smtp_relay_smtp H=relay.mailbaby.net [209.159.152.170] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=yes : SMTP error from remote mail server after end of data: 550 200 This message was classified as rSPAM and may not be delivered https://mail.outboundspamprotection.com/mailinfo?id=1a04c918e950001a4f&user=mb90171
+2026-08-29 08:10:24 1x0E8t-00000008Xq0-3Qsg <= <> R=1x0E8X-00000008XlL-3UGL U=Debian-exim P=local S=2519
+2026-08-29 08:10:24 1x0E8t-00000008Xq0-3Qsg == info@laptertech.store R=localuser T=local_delivery defer (-1): Tainted '/home/lapter/mail/laptertech.store/info/mail/laptertech.store/info' (file or directory name for local_delivery transport) not permitted
+2026-08-29 08:10:24 1x0E8X-00000008XlL-3UGL Completed
+2026-08-29 08:11:01 1x0E9V-00000008XqT-2Cu0 <= info@laptertech.store U=root P=local S=741
+2026-08-29 08:11:02 1x0E9V-00000008XqT-2Cu0 ** root@mail.laptertech.store R=send_via_smtp_relay T=smtp_relay_smtp H=relay.mailbaby.net [209.159.154.242] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=yes : SMTP error from remote mail server after end of data: 550 200 This message was classified as rSPAM and may not be delivered https://mail.outboundspamprotection.com/mailinfo?id=1a04c9274ea0004918&user=mb90171
+2026-08-29 08:11:02 1x0E9W-00000008Xqb-3BTF <= <> R=1x0E9V-00000008XqT-2Cu0 U=Debian-exim P=local S=2519
+2026-08-29 08:11:02 1x0E9V-00000008XqT-2Cu0 Completed
+2026-08-29 08:11:02 1x0E9W-00000008Xqb-3BTF == info@laptertech.store R=localuser T=local_delivery defer (-1): Tainted '/home/lapter/mail/laptertech.store/info/mail/laptertech.store/info' (file or directory name for local_delivery transport) not permitted
+2026-08-29 08:12:01 1x0EAT-00000008Xsy-2pPX <= info@laptertech.store U=root P=local S=741
+2026-08-29 08:12:06 1x0EAT-00000008Xsy-2pPX ** root@mail.laptertech.store R=send_via_smtp_relay T=smtp_relay_smtp H=relay.mailbaby.net [209.159.154.242] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=yes : SMTP error from remote mail server after end of data: 550 200 This message was classified as rSPAM and may not be delivered https://mail.outboundspamprotection.com/mailinfo?id=1a04c935ffc00042a0&user=mb90171
+2026-08-29 08:12:06 1x0EAY-00000008XtS-0sUT <= <> R=1x0EAT-00000008Xsy-2pPX U=Debian-exim P=local S=2519
+2026-08-29 08:12:06 1x0EAT-00000008Xsy-2pPX Completed
+2026-08-29 08:12:06 1x0EAY-00000008XtS-0sUT == info@laptertech.store R=localuser T=local_delivery defer (-1): Tainted '/home/lapter/mail/laptertech.store/info/mail/laptertech.store/info' (file or directory name for local_delivery transport) not permitted
+===11=== ROUNDCUBE ===
+RC_FILE: /etc/roundcube/config.inc.php
+$config["imap_host"] = "localhost:143";
+$config["smtp_host"] = "tls://mail.laptertech.store:587";
+===12=== EXIM LOCAL DELIVERY ===
+localuser_fwd_only:
+localuser_spam:
+localuser:
+  transport = local_delivery
+  file_transport = local_delivery
+local_delivery:
+===13=== REWRITE ===
+begin rewrite
+*@mail.laptertech.store   info@laptertech.store   bFfrs
+root@laptertech.store     info@laptertech.store   bFfrs
+
+
+
+===DONE===
