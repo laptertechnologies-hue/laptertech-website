@@ -1375,25 +1375,28 @@
                     </button>
                 </div>
 
-                <!-- Supabase Cloud Database Plan -->
+                <!-- Managed PostgreSQL Cloud Database Plan -->
                 <div class="pricing-card" style="border: 2px solid #10b981; position: relative;">
-                    <div style="position: absolute; top: -12px; right: 20px; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Backend Cloud</div>
+                    <div style="position: absolute; top: -12px; right: 20px; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Cloud Database</div>
                     <div class="pricing-header">
-                        <div class="pricing-name" style="color: #10b981;">Supabase Cloud DB</div>
-                        <div class="pricing-save">PostgreSQL, Realtime &amp; Auth APIs</div>
+                        <div class="pricing-name" style="color: #10b981;">PostgreSQL Cloud DB</div>
+                        <div class="pricing-save">Dedicated PostgreSQL 18 &amp; Web UI</div>
                     </div>
                     
                     <ul class="pricing-features">
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> Dedicated PostgreSQL 15 + pgvector</li>
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> Instant Auto-Generated REST &amp; GraphQL APIs</li>
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> Realtime WebSockets Data Subscriptions</li>
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> Built-in GoTrue Auth &amp; JWT Security</li>
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> S3-Compatible File &amp; Media Storage</li>
-                        <li><i class="fas fa-check" style="color: #10b981;"></i> Supabase Studio Web Management UI</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> Dedicated PostgreSQL 18 Database</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> Isolated User Role &amp; Secure Schema</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> Realtime Web Management UI (pgweb)</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> Direct Connection String + SSL Ready</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> Next.js, Node.js, Prisma, Python Ready</li>
+                        <li><i class="fas fa-check" style="color: #10b981;"></i> High-Speed NVMe SSD &amp; 99.9% Uptime</li>
                     </ul>
                     
-                    <a href="https://db.laptertech.store" target="_blank" rel="noopener noreferrer" class="btn" style="background: #10b981; color: white; display: block; text-align: center; font-weight: 600; border-radius: 8px; padding: 12px 20px; text-decoration: none;">
-                        <i class="fas fa-database" style="margin-right: 6px;"></i> Launch Supabase Studio
+                    <button class="btn btn-teal select-plan" data-plan="database" style="width: 100%; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-bolt" style="margin-right: 6px;"></i> Deploy Database
+                    </button>
+                    <a href="https://db.laptertech.store" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width: 100%; display: block; text-align: center; padding: 10px; font-size: 0.85rem; border-radius: 8px;">
+                        <i class="fas fa-table" style="margin-right: 6px;"></i> Launch Web Manager
                     </a>
                 </div>
             </div>
@@ -1744,14 +1747,26 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="hostingPlanSelect">Select Hosting Plan</label>
+                        <label for="hostingPlanSelect">Select Plan / Service</label>
                         <select id="hostingPlanSelect">
-                            <option value="basic">Basic Hosting</option>
-                            <option value="professional">Professional Hosting</option>
+                            <option value="basic">Basic Web Hosting</option>
+                            <option value="professional">Professional Web Hosting</option>
                             <option value="email-only">Business Email Only</option>
+                            <option value="database" selected>Managed PostgreSQL 18 Cloud DB</option>
                         </select>
                     </div>
                     
+                    <div class="form-group" id="databaseHostingFields" style="display: block; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <div style="margin-bottom: 12px;">
+                            <label for="dbProjectName">Database / Project Name (Optional)</label>
+                            <input type="text" id="dbProjectName" placeholder="e.g. ecommerce_db or app_db" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: inherit;">
+                            <small style="color: #94a3b8; font-size: 0.75rem; display: block; margin-top: 4px;">Alphanumeric and underscores only. Defaults to your username if left blank.</small>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 12px; font-size: 0.8rem; color: #10b981;">
+                            <i class="fas fa-database" style="margin-right: 6px;"></i> An isolated PostgreSQL 18 database, user role, direct connection string, and Web UI login details will be instantly provisioned and emailed to you.
+                        </div>
+                    </div>
+
                     <div class="form-group" id="emailHostingFields" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
                         <div style="margin-bottom: 15px;">
                             <label for="mailboxCountSelect">Number of Email Mailboxes</label>
@@ -1773,13 +1788,13 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" id="domainFieldGroup">
                         <label for="domainName">Domain Name (Optional)</label>
                         <input type="text" id="domainName" placeholder="yourwebsite.com">
                     </div>
                     
                     <button type="submit" class="btn btn-green" style="width: 100%; margin-top: 20px;">
-                        <i class="fas fa-rocket"></i> Create Account & Deploy
+                        <i class="fas fa-rocket"></i> Create Account &amp; Deploy
                     </button>
                 </form>
             </div>
@@ -1980,22 +1995,37 @@
         const selectPlanButtons = document.querySelectorAll('.select-plan');
         const hostingPlanSelect = document.getElementById('hostingPlanSelect');
         const emailHostingFields = document.getElementById('emailHostingFields');
+        const databaseHostingFields = document.getElementById('databaseHostingFields');
+        const domainFieldGroup = document.getElementById('domainFieldGroup');
 
-        hostingPlanSelect?.addEventListener('change', () => {
-            if (hostingPlanSelect.value === 'email-only') {
-                emailHostingFields.style.display = 'block';
+        function updatePlanFields() {
+            const val = hostingPlanSelect ? hostingPlanSelect.value : '';
+            if (val === 'email-only') {
+                if (emailHostingFields) emailHostingFields.style.display = 'block';
+                if (databaseHostingFields) databaseHostingFields.style.display = 'none';
+                if (domainFieldGroup) domainFieldGroup.style.display = 'block';
+            } else if (val === 'database') {
+                if (emailHostingFields) emailHostingFields.style.display = 'none';
+                if (databaseHostingFields) databaseHostingFields.style.display = 'block';
+                if (domainFieldGroup) domainFieldGroup.style.display = 'none';
             } else {
-                emailHostingFields.style.display = 'none';
+                if (emailHostingFields) emailHostingFields.style.display = 'none';
+                if (databaseHostingFields) databaseHostingFields.style.display = 'none';
+                if (domainFieldGroup) domainFieldGroup.style.display = 'block';
             }
-        });
+        }
+
+        hostingPlanSelect?.addEventListener('change', updatePlanFields);
         
         selectPlanButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const plan = button.getAttribute('data-plan');
-                accountModal.style.display = 'flex';
+                if (accountModal) accountModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-                hostingPlanSelect.value = plan;
-                hostingPlanSelect.dispatchEvent(new Event('change'));
+                if (hostingPlanSelect) {
+                    hostingPlanSelect.value = plan;
+                    updatePlanFields();
+                }
             });
         });
         
@@ -2021,67 +2051,127 @@
                 font-family: 'Inter', sans-serif;
             `;
 
-            overlay.innerHTML = `
-                <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; width: 100%; max-width: 580px; padding: 30px; color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 10px auto;">
-                            <i class="fas fa-circle-check"></i>
+            if (data.serviceType === 'database') {
+                overlay.innerHTML = `
+                    <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; width: 100%; max-width: 600px; padding: 30px; color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="width: 54px; height: 54px; background: rgba(16, 185, 129, 0.12); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 10px auto;">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; color: #f8fafc;">PostgreSQL Database Active!</h3>
+                            <p style="color: #94a3b8; font-size: 0.85rem;">Welcome aboard, ${fullName}! Your cloud database and user have been provisioned.</p>
                         </div>
-                        <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">Account Active & Provisioned!</h3>
-                        <p style="color: #94a3b8; font-size: 0.85rem;">Welcome aboard, ${fullName}! Your server space is ready.</p>
-                    </div>
 
-                    <div style="display: grid; gap: 15px; margin-bottom: 25px; text-align: left;">
-                        <!-- Step 1 -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-network-wired"></i> Step 1: Connect your Domain</h4>
-                            <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Update your domain nameservers or add these DNS A records at your registrar (e.g. GoDaddy):</p>
-                            <div style="background: #0f172a; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 0.75rem; color: #38bdf8; line-height: 1.4;">
-                                A Record &nbsp;&nbsp; @ &nbsp;&nbsp; [Contact us for server IP]<br>
-                                CNAME &nbsp;&nbsp;&nbsp;&nbsp; www &nbsp; @
+                        <div style="display: grid; gap: 14px; margin-bottom: 25px; text-align: left;">
+                            <!-- Direct Credentials -->
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 10px;">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #10b981; margin-bottom: 8px;"><i class="fas fa-key" style="margin-right: 6px;"></i> Step 1: Database Connection Parameters</h4>
+                                <table style="width: 100%; font-size: 0.82rem; border-collapse: collapse; color: #e2e8f0;">
+                                    <tr><td style="padding: 4px 0; color: #94a3b8; width: 120px;">Host:</td><td style="font-family: monospace; font-weight: 600; color: #38bdf8;">${data.host || '162.35.98.198'}</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #94a3b8;">Port:</td><td style="font-family: monospace; font-weight: 600;">${data.port || 5432}</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #94a3b8;">Database Name:</td><td style="font-family: monospace; font-weight: 600; color: #38bdf8;">${data.dbName}</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #94a3b8;">User Role:</td><td style="font-family: monospace; font-weight: 600; color: #38bdf8;">${data.dbUser}</td></tr>
+                                    <tr><td style="padding: 4px 0; color: #94a3b8;">Password:</td><td style="font-family: monospace; color: #f43f5e; font-weight: 600;">${data.password}</td></tr>
+                                </table>
+                            </div>
+
+                            <!-- Connection String -->
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #10b981; margin: 0;"><i class="fas fa-link" style="margin-right: 6px;"></i> Step 2: Instant Connection URI</h4>
+                                    <button onclick="navigator.clipboard.writeText('${data.connectionString}'); this.innerText='Copied!';" style="background: #10b981; border: none; color: white; padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                                        <i class="fas fa-copy"></i> Copy URI
+                                    </button>
+                                </div>
+                                <div style="background: #0f172a; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px; font-family: monospace; font-size: 0.78rem; color: #38bdf8; word-break: break-all; line-height: 1.4;">
+                                    ${data.connectionString}
+                                </div>
+                            </div>
+
+                            <!-- Web Dashboard (pgweb) -->
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 10px;">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #10b981; margin-bottom: 8px;"><i class="fas fa-table" style="margin-right: 6px;"></i> Step 3: Web Database Dashboard</h4>
+                                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;">Explore tables and run SQL queries in your browser at <a href="https://db.laptertech.store" target="_blank" style="color: #38bdf8; text-decoration: underline;">db.laptertech.store</a>.</p>
+                                <a href="https://db.laptertech.store" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #008099, #0b2149); color: white; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 0.82rem; border-radius: 6px; text-decoration: none; font-weight: 600;">
+                                    <i class="fas fa-external-link-alt"></i> Open Database Dashboard
+                                </a>
+                            </div>
+
+                            <!-- Email Notification Banner -->
+                            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 10px 14px; font-size: 0.78rem; color: #93c5fd;">
+                                <i class="fas fa-envelope" style="margin-right: 6px;"></i> A copy of these credentials and framework connection code (.env, Prisma, Node.js) has been emailed to <strong>${email}</strong>.
                             </div>
                         </div>
 
-                        <!-- Step 2 -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-sliders"></i> Step 2: Hosting Control Panel</h4>
-                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
-                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">URL:</td><td><a href="${data.controlPanel}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.controlPanel}</a></td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Username:</td><td style="font-weight: 600; color: #38bdf8;">${data.username}</td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.password}</td></tr>
-                            </table>
-                        </div>
-
-                        <!-- Step 3 (Conditional) -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px; ${data.serviceType === 'email-only' ? 'display: none;' : ''}">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-database"></i> Step 3: MySQL Database</h4>
-                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
-                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Database:</td><td style="font-weight: 600;">${data.dbName}</td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">DB User:</td><td style="font-weight: 600;">${data.dbUser}</td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">DB Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.dbPassword}</td></tr>
-                            </table>
-                        </div>
-
-                        <!-- Step 4 -->
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
-                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-envelope"></i> Step ${data.serviceType === 'email-only' ? '3' : '4'}: Business Email & Webmail</h4>
-                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
-                                <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Webmail URL:</td><td><a href="${data.webmail}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.webmail}</a></td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Email Address:</td><td style="font-weight: 600; color: #38bdf8;">${data.emailAccount}</td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Email Pass:</td><td style="font-family: monospace; color: #f43f5e;">${data.emailPassword}</td></tr>
-                                ${data.serviceType === 'email-only' ? `
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Mailbox Limit:</td><td style="font-weight: 600;">Max ${data.mailboxLimit} Accounts</td></tr>
-                                <tr><td style="padding: 3px 0; color: #94a3b8;">Total Storage:</td><td style="font-weight: 600;">${data.storageQuota}</td></tr>
-                                ` : ''}
-                            </table>
-                        </div>
+                        <button onclick="document.getElementById('successDetailsModal').remove()" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 12px 24px; font-size: 0.9rem; width: 100%; border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-check" style="margin-right: 6px;"></i> I have saved my database credentials
+                        </button>
                     </div>
+                `;
+            } else {
+                // Web Hosting & Email Only
+                overlay.innerHTML = `
+                    <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; width: 100%; max-width: 580px; padding: 30px; color: #f8fafc; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); max-height: 90vh; overflow-y: auto;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 10px auto;">
+                                <i class="fas fa-circle-check"></i>
+                            </div>
+                            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">Account Active & Provisioned!</h3>
+                            <p style="color: #94a3b8; font-size: 0.85rem;">Welcome aboard, ${fullName}! Your server space is ready.</p>
+                        </div>
 
-                    <button onclick="document.getElementById('successDetailsModal').remove()" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 10px 20px; font-size: 0.9rem;">
-                        <i class="fas fa-check"></i> I have saved these credentials
-                    </button>
-                </div>
-            `;
+                        <div style="display: grid; gap: 15px; margin-bottom: 25px; text-align: left;">
+                            <!-- Step 1 -->
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-network-wired"></i> Step 1: Connect your Domain</h4>
+                                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px;">Update your domain nameservers or add these DNS A records at your registrar (e.g. GoDaddy):</p>
+                                <div style="background: #0f172a; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 0.75rem; color: #38bdf8; line-height: 1.4;">
+                                    A Record &nbsp;&nbsp; @ &nbsp;&nbsp; [Contact us for server IP]<br>
+                                    CNAME &nbsp;&nbsp;&nbsp;&nbsp; www &nbsp; @
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-sliders"></i> Step 2: Hosting Control Panel</h4>
+                                <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                    <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">URL:</td><td><a href="${data.controlPanel}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.controlPanel}</a></td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Username:</td><td style="font-weight: 600; color: #38bdf8;">${data.username}</td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.password}</td></tr>
+                                </table>
+                            </div>
+
+                            <!-- Step 3 (Conditional) -->
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px; ${data.serviceType === 'email-only' ? 'display: none;' : ''}">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-database"></i> Step 3: MySQL Database</h4>
+                                <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                    <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Database:</td><td style="font-weight: 600;">${data.dbName}</td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">DB User:</td><td style="font-weight: 600;">${data.dbUser}</td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">DB Password:</td><td style="font-family: monospace; color: #f43f5e;">${data.dbPassword}</td></tr>
+                                </table>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 14px; border-radius: 8px;">
+                                <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: #3b82f6; margin-bottom: 6px;"><i class="fas fa-envelope"></i> Step ${data.serviceType === 'email-only' ? '3' : '4'}: Business Email & Webmail</h4>
+                                <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse; color: #e2e8f0;">
+                                    <tr><td style="padding: 3px 0; color: #94a3b8; width: 100px;">Webmail URL:</td><td><a href="${data.webmail}" target="_blank" style="color: #38bdf8; text-decoration: none;">${data.webmail}</a></td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Email Address:</td><td style="font-weight: 600; color: #38bdf8;">${data.emailAccount}</td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Email Pass:</td><td style="font-family: monospace; color: #f43f5e;">${data.emailPassword}</td></tr>
+                                    ${data.serviceType === 'email-only' ? `
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Mailbox Limit:</td><td style="font-weight: 600;">Max ${data.mailboxLimit} Accounts</td></tr>
+                                    <tr><td style="padding: 3px 0; color: #94a3b8;">Total Storage:</td><td style="font-weight: 600;">${data.storageQuota}</td></tr>
+                                    ` : ''}
+                                </table>
+                            </div>
+                        </div>
+
+                        <button onclick="document.getElementById('successDetailsModal').remove()" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); padding: 10px 20px; font-size: 0.9rem;">
+                            <i class="fas fa-check"></i> I have saved these credentials
+                        </button>
+                    </div>
+                `;
+            }
 
             document.body.appendChild(overlay);
         }
@@ -2094,17 +2184,21 @@
             
             const fullName = document.getElementById('fullName').value;
             const email = document.getElementById('accountEmail').value;
+            const password = document.getElementById('accountPassword').value;
             const hostingPlan = document.getElementById('hostingPlanSelect').value;
-            const domainName = document.getElementById('domainName').value.trim() || '';
+            const domainName = document.getElementById('domainName') ? document.getElementById('domainName').value.trim() : '';
+            const dbProjectName = document.getElementById('dbProjectName') ? document.getElementById('dbProjectName').value.trim() : '';
             
             const isEmailOnly = hostingPlan === 'email-only';
+            const isDatabase = hostingPlan === 'database';
             const mCount = isEmailOnly ? document.getElementById('mailboxCountSelect').value : 1;
             const mStorage = isEmailOnly ? document.getElementById('mailboxStorageSelect').value : 5;
 
             const planNames = {
-                'basic': 'Basic Hosting',
-                'professional': 'Professional Hosting',
-                'email-only': 'Business Email Only'
+                'basic': 'Basic Web Hosting',
+                'professional': 'Professional Web Hosting',
+                'email-only': 'Business Email Only',
+                'database': 'Managed PostgreSQL 18 Cloud DB'
             };
 
             const submitBtn = accountForm.querySelector('button[type="submit"]');
@@ -2121,9 +2215,11 @@
                 body: JSON.stringify({
                     name: fullName,
                     email: email,
-                    plan: planNames[hostingPlan],
+                    password: password,
+                    plan: planNames[hostingPlan] || 'Managed PostgreSQL 18 Cloud DB',
                     domain: domainName,
-                    serviceType: isEmailOnly ? 'email-only' : 'web-hosting',
+                    dbName: dbProjectName,
+                    serviceType: isDatabase ? 'database' : (isEmailOnly ? 'email-only' : 'web-hosting'),
                     mailboxCount: parseInt(mCount, 10),
                     mailboxStorage: parseInt(mStorage, 10)
                 })
@@ -2132,7 +2228,7 @@
             .then(data => {
                 if (data.success) {
                     accountForm.reset();
-                    accountModal.style.display = 'none';
+                    if (accountModal) accountModal.style.display = 'none';
                     document.body.style.overflow = 'auto';
                     showSuccessModal(data, fullName, email);
                 } else {
